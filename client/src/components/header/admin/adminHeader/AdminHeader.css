@@ -1,0 +1,46 @@
+.admin-header {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 90px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 0;
+}
+
+.admin-logo {
+  height: 40px;
+  width: auto;
+}
+
+.admin-company-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.admin-profile-button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-profile-button:hover {
+  background-color: #6f50db;
+}

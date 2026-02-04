@@ -1,0 +1,19 @@
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.admin-body {
+  display: flex;
+  flex: 1;
+  margin-top: 90px;
+}
+
+.admin-content {
+  margin-left: 240px;
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  background-color: #fff;
+}

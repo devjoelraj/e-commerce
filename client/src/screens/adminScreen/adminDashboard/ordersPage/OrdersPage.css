@@ -1,0 +1,70 @@
+.orderspage-container {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.orderspage-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.orderspage-table-wrapper {
+  overflow-x: auto;
+}
+
+.orderspage-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orderspage-thead {
+  background: #f8f9fa;
+}
+
+.orderspage-header-row {
+  text-align: left;
+}
+
+.orderspage-th {
+  padding: 12px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.orderspage-tbody .orderspage-row:hover {
+  background: #f9f9f9;
+}
+
+.orderspage-td {
+  padding: 12px 15px;
+  font-size: 14px;
+  color: #555;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.orderspage-orderid {
+  color: #4b7bec;
+  font-weight: 500;
+}
+
+.orderspage-btn {
+  background-color: #4b7bec;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.3s ease;
+}
+
+.orderspage-btn:hover {
+  background-color: #375bb5;
+}

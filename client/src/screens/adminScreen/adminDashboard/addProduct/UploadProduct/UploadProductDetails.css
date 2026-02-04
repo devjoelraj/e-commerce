@@ -1,0 +1,169 @@
+.my-page-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+.uploadpage-container {
+  padding: 16px;
+  width: 50%;
+}
+.uploadpage-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.my-flex-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 0;
+}
+
+.my-inventory-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.my-total-stock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+}
+
+/* -------- Color Section -------- */
+.my-color-section {
+  padding: 16px;
+}
+
+.my-color-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.my-color-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.my-upload-btn {
+  border: 1px dashed #aaa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.my-ok-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  background: var(--primary-color, #8864f0);
+  color: white;
+}
+
+.my-color-card {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.my-color-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.my-color-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.my-color-thumbnail {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+.my-delete-btn {
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.my-image-list {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.my-image-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.my-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-remove-img-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.my-add-img-box {
+  width: 100px;
+  height: 100px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  color: #777;
+}
+
+.my-input-feild {
+  width: 100%;
+  padding: 8px 35px 8px 10px;
+  border: 2px solid var(--primary-color);
+  border-radius: 6px;
+  background-color: white;
+  color: var(--text-color);
+  margin: 12px 0;
+}

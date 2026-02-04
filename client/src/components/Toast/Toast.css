@@ -1,0 +1,33 @@
+.ant-message-notice-content {
+  font-size: 16px;
+  padding: 12px 65px;
+  border-radius: 8px;
+  background-color: #f0fdf4 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #14532d;
+  position: relative;
+}
+
+.ant-message-success .ant-message-notice-content {
+  background-color: #047857 !important;
+  color: #ecfdf5;
+}
+
+.ant-message-error .ant-message-notice-content {
+  background-color: #b91c1c !important;
+  color: #fef2f2;
+}
+
+.custom-toast {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.toast-close-icon {
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 12px;
+  color: #000;
+}

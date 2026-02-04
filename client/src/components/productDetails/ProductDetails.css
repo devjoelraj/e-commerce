@@ -1,0 +1,252 @@
+:root {
+  --primary-color: #8864f0;
+  --bg-color: #e8dfff;
+  --text-color: #2c2c2c;
+}
+
+.product-details-container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 100px 0 0 0;
+  gap: 2rem;
+  color: var(--text-color);
+}
+
+.product-details-images-section {
+  flex: 1;
+  min-width: 300px;
+  padding: 16px;
+}
+
+.product-details-main-image {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.product-details-thumbnail-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.product-details-thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border 0.3s ease;
+}
+
+.product-details-thumbnail:hover {
+  border-color: var(--primary-color);
+}
+
+.product-details-section {
+  flex: 1;
+  min-width: 300px;
+  padding: 16px;
+}
+
+.product-details-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.product-details-rating {
+  color: #ffc107;
+  font-size: 1rem;
+}
+
+.product-details-price {
+  font-size: 2rem;
+  margin: 1rem 0;
+  color: var(--text-color);
+}
+
+.product-details-label {
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+
+.product-details-color-options {
+  display: flex;
+  gap: 10px;
+}
+
+.product-details-color-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.product-details-size-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.product-details-size-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--primary-color);
+  background-color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-color);
+  transition: background-color 0.3s ease;
+}
+
+.product-details-size-btn:hover {
+  background-color: #f3ebff;
+}
+
+.product-details-size-btn.selected {
+  background-color: var(--bg-color);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.product-details-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.product-details-add-to-cart {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.product-details-add-to-cart:hover {
+  background-color: #7454d1;
+}
+
+.product-details-wishlist-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--primary-color);
+}
+
+.product-details-delivery-info {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.product-tabs-container {
+  padding: 1rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #2c2c2c;
+}
+
+.product-tabs-header {
+  display: flex;
+  gap: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
+}
+
+.product-tab-button {
+  font-size: 14px;
+  color: grey;
+  cursor: pointer;
+  padding-bottom: 4px;
+  transition: color 0.2s ease;
+}
+
+.product-tab-button:hover {
+  color: #555;
+}
+
+.product-tab-button.active-tab {
+  color: black;
+  border-bottom: 2px solid black;
+}
+
+.product-tab-content {
+  padding: 1rem 0;
+}
+
+.product-details-content p,
+.product-reviews-content p {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media screen and (max-width: 768px) {
+  .product-details-container {
+    flex-direction: column;
+    padding: 100px 0 0 0;
+    gap: 1rem;
+  }
+
+  .product-details-name {
+    font-size: 1.2rem;
+  }
+
+  .product-details-price {
+    font-size: 1.5rem;
+  }
+
+  .product-details-rating {
+    font-size: 0.9rem;
+  }
+
+  .product-details-label {
+    font-size: 0.95rem;
+  }
+
+  .product-details-size-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .product-details-add-to-cart {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .product-details-wishlist-icon {
+    font-size: 1.2rem;
+  }
+
+  .product-details-delivery-info {
+    font-size: 0.85rem;
+  }
+  .product-tabs-header {
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .product-tab-button {
+    font-size: 16px;
+    padding-bottom: 6px;
+  }
+
+  .product-details-content p,
+  .product-reviews-content p {
+    font-size: 15px;
+  }
+
+  .product-tabs-container {
+    padding: 0.75rem;
+  }
+}

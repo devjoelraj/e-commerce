@@ -1,0 +1,52 @@
+.allproducts-container {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.allproducts-heading {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.allproducts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.allproducts-th {
+  text-align: left;
+  padding: 12px 15px;
+  background-color: #f5f6fa;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.allproducts-tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.allproducts-td {
+  padding: 12px 15px;
+  font-size: 14px;
+  color: #555;
+  border-bottom: 1px solid #eee;
+}
+
+.allproducts-btn {
+  padding: 6px 14px;
+  border: none;
+  background-color: #4e73df;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.allproducts-btn:hover {
+  background-color: #375ac3;
+}
