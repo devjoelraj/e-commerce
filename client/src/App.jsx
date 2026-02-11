@@ -11,23 +11,24 @@ import AddProduct from "./screens/adminScreen/adminDashboard/addProduct/AddProdu
 import UploadProductDetails from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/index";
 import OrdersPage from "./screens/adminScreen/adminDashboard/ordersPage";
 import AllProducts from "./screens/adminScreen/adminDashboard/allProducts";
+import DashboardSilders from "./screens/adminScreen/adminDashboard/addProduct/dashboardSilders/DashboardSilders";
+import OfferProducts from "./screens/adminScreen/adminDashboard/addProduct/offerProducts/OfferProducts";
 
 const Login = lazy(() => import("./screens/authScreens/login/Login"));
 const Otp = lazy(() => import("./screens/authScreens/otp/Otp"));
-const ForgetPassword = lazy(() =>
-  import(
-    "./screens/authScreens/passwordScreens/forgetPasswords/ForgetPasswords"
-  )
+const ForgetPassword = lazy(
+  () =>
+    import("./screens/authScreens/passwordScreens/forgetPasswords/ForgetPasswords"),
 );
-const CreatePassword = lazy(() =>
-  import("./screens/authScreens/passwordScreens/CreatePassword")
+const CreatePassword = lazy(
+  () => import("./screens/authScreens/passwordScreens/CreatePassword"),
 );
 
-const AdminDashboard = lazy(() =>
-  import("./screens/adminScreen/adminDashboard/AdminDashboard")
+const AdminDashboard = lazy(
+  () => import("./screens/adminScreen/adminDashboard/AdminDashboard"),
 );
-const UserDashboard = lazy(() =>
-  import("./screens/userScreens/userDashBoard/UserDashBoard")
+const UserDashboard = lazy(
+  () => import("./screens/userScreens/userDashBoard/UserDashBoard"),
 );
 
 function App() {
@@ -50,6 +51,9 @@ function App() {
             <Route index element={<AdminDashBoardHome />} />
             <Route path="admin-dashboard" element={<AdminDashBoardHome />} />
             <Route path="admin-AddProduct" element={<AddProduct />} />
+            <Route path="DashboardSilders" element={<DashboardSilders />} />
+            <Route path="add-offer-product" element={<OfferProducts />} />
+
             <Route
               path="upload-product-details"
               element={<UploadProductDetails />}

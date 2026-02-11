@@ -56,9 +56,6 @@ const Profile = () => {
               <div className="card-wrapper">
                 <ProductCards />
               </div>
-              <div className="card-wrapper">
-                <ProductCards />
-              </div>
             </div>
           </div>
         </div>

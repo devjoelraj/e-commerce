@@ -2,16 +2,18 @@ import React from "react";
 import { FaTasks, FaServer, FaShoppingCart, FaUserPlus } from "react-icons/fa";
 import SalesSummaryChart from "../../../components/charts/lineChart";
 import "./AdminDashBoard.css";
+import StackedBarChart from "../../../components/charts/Stacked";
 
 const data = [
-  { month: "Jan", iPhone: 4000, iPad: 2400 },
-  { month: "Feb", iPhone: 3000, iPad: 1398 },
-  { month: "Mar", iPhone: 2000, iPad: 9800 },
-  { month: "Apr", iPhone: 2780, iPad: 3908 },
-  { month: "May", iPhone: 1890, iPad: 4800 },
-  { month: "Jun", iPhone: 2390, iPad: 3800 },
-  { month: "Jul", iPhone: 3490, iPad: 4300 },
-  { month: "Aug", iPhone: 5000, iPad: 6000 },
+  { weeks: "week1", pastWeek: 4000, presentWeek: 2400 },
+  { weeks: "week2", pastWeek: 5000, presentWeek: 2000 },
+  { weeks: "week3", pastWeek: 3000, presentWeek: 2700 },
+  { weeks: "week4", pastWeek: 2000, presentWeek: 3000 },
+];
+const ordersData = [
+  { day: "Mon", online: 120, offline: 80 },
+  { day: "Tue", online: 200, offline: 150 },
+  { day: "Wed", online: 170, offline: 100 },
 ];
 
 const feedItems = [
@@ -52,24 +54,18 @@ const AdminDashBoardHome = () => {
         <div className="admindashboard-dashboard-chart">
           <SalesSummaryChart chartData={data} />
         </div>
-
-        <div className="admindashboard-dashboard-feed">
-          <div className="admindashboard-feed-card">
-            <h3 className="admindashboard-feed-title">Feeds</h3>
-            <ul className="admindashboard-feed-list">
-              {feedItems.map((item, index) => (
-                <li className="admindashboard-feed-item" key={index}>
-                  <div className="admindashboard-feed-icon">{item.icon}</div>
-                  <div className="admindashboard-feed-content">
-                    <p className="admindashboard-feed-text">{item.text}</p>
-                    <span className="admindashboard-feed-time">
-                      {item.time}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="admindashboard-dashboard-chart">
+          <StackedBarChart
+            title="Online vs Offline Orders"
+            data={ordersData}
+            xKey="day"
+            stacked={true}
+            barKeys={[
+              { dataKey: "online", color: "#8a64f0" },
+              { dataKey: "offline", color: "#64c2f0" },
+            ]}
+          />
+          ;
         </div>
       </div>
 

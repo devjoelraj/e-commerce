@@ -23,26 +23,27 @@ const SalesSummaryChart = React.memo(({ chartData }) => {
       }}
     >
       <h3 style={{ marginBottom: "20px" }}>Sales Summary</h3>
+
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          <XAxis dataKey="month" />
+          <XAxis dataKey="weeks" />
           <YAxis />
           <Tooltip />
-          <Legend verticalAlign="top" height={36} />
+          <Legend />
+
           <Line
             type="monotone"
-            dataKey="iPhone"
+            dataKey="pastWeek"
             stroke="#8a64f0"
             strokeWidth={2}
-            dot={false}
           />
+
           <Line
             type="monotone"
-            dataKey="iPad"
+            dataKey="presentWeek"
             stroke="#64c2f0"
             strokeWidth={2}
-            dot={false}
           />
         </LineChart>
       </ResponsiveContainer>
