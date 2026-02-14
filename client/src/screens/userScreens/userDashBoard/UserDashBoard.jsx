@@ -8,7 +8,9 @@ import {
   GiArmoredPants,
   GiConverseShoe,
   GiDress,
+  GiFlipFlops,
   GiHighHeel,
+  GiWatch,
 } from "react-icons/gi";
 import HomeCarousel from "./Carousel/Carousel";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,9 +18,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 const categories = [
   { name: "Shirts", icon: <FaTshirt size={40} color="#8864f0" /> },
   { name: "Pants", icon: <GiArmoredPants size={40} color="#4caf50" /> },
-  { name: "Heels", icon: <GiHighHeel size={40} color="#f06292" /> },
   { name: "Shoes", icon: <GiConverseShoe size={40} color="#3f51b5" /> },
-  { name: "Skirts", icon: <GiDress size={40} color="#ff6f00" /> },
+  { name: "Slippers", icon: <GiFlipFlops size={40} color="#3f51b5" /> },
+  { name: "Accessories", icon: <GiWatch size={40} color="#3f51b5" /> },
 ];
 const UserDashBoard = () => {
   const dealsRef = useRef(null);
@@ -60,13 +62,21 @@ const UserDashBoard = () => {
       </div>
       <div style={{ padding: 16 }}>
         <h3>Best selling products</h3>
-        <div className="product-grid">
-          <ProductCards />
-          <ProductCards />
-          <ProductCards />
-          <ProductCards />
+        <div className="flash-deals">
+          <div className="card-wrapper">
+            <ProductCards />
+          </div>
+          <div className="card-wrapper">
+            <ProductCards />
+          </div>
+          <div className="card-wrapper">
+            <ProductCards />
+          </div>
         </div>
-
+        <div>
+          <h3>Browse By Category</h3>
+          <div className="flash-deals">{renderingCategory()}</div>
+        </div>
         <h3 style={{ marginTop: "40px" }} ref={dealsRef}>
           Flash Deals
         </h3>
@@ -90,11 +100,6 @@ const UserDashBoard = () => {
             <ProductCards />
           </div>
         </div>
-      </div>
-
-      <div style={{ padding: 16 }}>
-        <h3>Browse By Category</h3>
-        <div className="icon-grid">{renderingCategory()}</div>
       </div>
 
       <Footer />

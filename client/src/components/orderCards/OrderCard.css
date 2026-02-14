@@ -1,0 +1,75 @@
+.order-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.order-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.order-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.order-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.order-info p {
+  font-size: 16px;
+  margin: 0;
+  color: #555;
+}
+
+/* Cancel Button */
+.cancel-btn {
+  width: fit-content;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background-color: #ff4d4f;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #d9363e;
+}
+
+/* Status Text */
+.pending-text {
+  color: #faad14;
+  font-weight: 600;
+}
+
+.delivered-text {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.cancelled-text {
+  color: #ff4d4f;
+  font-weight: 600;
+}
