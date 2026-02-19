@@ -15,7 +15,7 @@ const AddProduct = () => {
     {
       title: "New Products",
       subtitle: "",
-      onAdd: () => navigate("/admin/upload-product-details"),
+      onAdd: () => navigate("/admin/sel-upload-products"),
     },
     {
       title: "Offers Products",

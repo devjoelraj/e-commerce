@@ -8,11 +8,15 @@ import Profile from "./screens/userScreens/profile/Profile";
 import AdminDashBoardHome from "./screens/adminScreen/adminDashboard/AdminDashboard";
 import AdminLayout from "./screens/adminScreen/layout";
 import AddProduct from "./screens/adminScreen/adminDashboard/addProduct/AddProduct";
-import UploadProductDetails from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/index";
 import OrdersPage from "./screens/adminScreen/adminDashboard/ordersPage";
 import AllProducts from "./screens/adminScreen/adminDashboard/allProducts";
 import DashboardSilders from "./screens/adminScreen/adminDashboard/addProduct/dashboardSilders/DashboardSilders";
 import OfferProducts from "./screens/adminScreen/adminDashboard/addProduct/offerProducts/OfferProducts";
+import UploadPants from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/pants/UploadPants";
+import UploadAccessiors from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/accessiors/UploadAccessiors";
+import FootWears from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/footwears/UploadFootwears";
+import UploadShirts from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/shirts/UploadShirts";
+import UploadProducts from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/Products";
 
 const Login = lazy(() => import("./screens/authScreens/login/Login"));
 const Otp = lazy(() => import("./screens/authScreens/otp/Otp"));
@@ -53,11 +57,16 @@ function App() {
             <Route path="admin-AddProduct" element={<AddProduct />} />
             <Route path="DashboardSilders" element={<DashboardSilders />} />
             <Route path="add-offer-product" element={<OfferProducts />} />
+            <Route path="sel-upload-products" element={<UploadProducts />} />
 
+            <Route path="upload-product-shirts" element={<UploadShirts />} />
+            <Route path="upload-product-pants" element={<UploadPants />} />
             <Route
-              path="upload-product-details"
-              element={<UploadProductDetails />}
+              path="upload-product-accessiors"
+              element={<UploadAccessiors />}
             />
+            <Route path="upload-product-footWears" element={<FootWears />} />
+
             <Route path="ordersPage-details" element={<OrdersPage />} />
             <Route path="AllProducts-details" element={<AllProducts />} />
           </Route>

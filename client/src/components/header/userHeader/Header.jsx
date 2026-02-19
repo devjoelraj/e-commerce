@@ -28,10 +28,11 @@ const Header = () => {
     "Shirts",
     "Pants",
     "Accessories",
-    "shoe",
+    "footwears",
   ];
 
   const dropdownSections = {
+    footwears: ["shoe", "silppers"],
     Accessories: ["Watch", "Chains", "Rings"],
   };
 

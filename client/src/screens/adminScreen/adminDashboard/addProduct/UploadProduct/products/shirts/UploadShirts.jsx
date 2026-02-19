@@ -1,23 +1,35 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import "./UploadProductDetails.css";
+import "./uploadShirts.css";
 
-const UploadProductDetails = () => {
+const UploadShirts = () => {
   const location = useLocation();
+
   const [colors, setColors] = useState([]);
   const [imagesByColor, setImagesByColor] = useState({});
   const [colorInput, setColorInput] = useState("");
+  const [colorHex, setColorHex] = useState("#000000");
 
-  const handleAddColor = (color) => {
-    if (color && !colors.find((c) => c.name === color)) {
-      const newColor = { name: color, image: null };
-      setColors((prev) => [...prev, newColor]);
-      setImagesByColor((prev) => ({ ...prev, [color]: [] }));
-    }
+  const handleAddColor = () => {
+    if (!colorInput.trim()) return;
+    if (colors.find((c) => c.name === colorInput.trim())) return;
+    const newColor = {
+      name: colorInput.trim(),
+      hex: colorHex,
+    };
+    setColors((prev) => [...prev, newColor]);
+    setImagesByColor((prev) => ({
+      ...prev,
+      [newColor.name]: [],
+    }));
+
+    setColorInput("");
+    setColorHex("#000000");
   };
 
   const handleImageChange = (e, colorName) => {
     const files = Array.from(e.target.files);
+
     const newImages = files.map((file) => ({
       file,
       url: URL.createObjectURL(file),
@@ -29,13 +41,26 @@ const UploadProductDetails = () => {
     }));
   };
 
-  const handleRemove = (colorName, index) => {
+  // ---------- REMOVE IMAGE ----------
+  const handleRemoveImage = (colorName, index) => {
     setImagesByColor((prev) => ({
       ...prev,
       [colorName]: prev[colorName].filter((_, i) => i !== index),
     }));
   };
 
+  // ---------- REMOVE COLOR ----------
+  const handleRemoveColor = (colorName) => {
+    setColors((prev) => prev.filter((c) => c.name !== colorName));
+
+    setImagesByColor((prev) => {
+      const updated = { ...prev };
+      delete updated[colorName];
+      return updated;
+    });
+  };
+
+  // ---------- REUSABLE INPUT ----------
   const renderInput = (id, label, type = "text", placeholder = "") => (
     <div className="uploadpage-form-group">
       <label htmlFor={id} className="uploadpage-label">
@@ -53,9 +78,9 @@ const UploadProductDetails = () => {
   const flexRow = (children) => <div className="my-flex-row">{children}</div>;
 
   return (
-    <div>
-      {" "}
+    <>
       <div className="my-page-container">
+        {/* ---------------- LEFT SIDE ---------------- */}
         <div className="uploadpage-container">
           <h2 className="uploadpage-title">Upload Product Details</h2>
 
@@ -63,177 +88,137 @@ const UploadProductDetails = () => {
             "productName",
             "Product Name",
             "text",
-            "Enter product name"
+            "Enter product name",
           )}
 
           <div className="uploadpage-form-group">
-            <label htmlFor="productDescription" className="uploadpage-label">
-              Description
-            </label>
+            <label className="uploadpage-label">Description</label>
             <textarea
-              id="productDescription"
               rows="4"
               className="my-input-feild"
               placeholder="Enter product description"
-            ></textarea>
+            />
           </div>
 
           <hr style={{ marginTop: 30 }} />
-
+          <h3 style={{ textAlign: "center", margin: "4px 0" }}>Price</h3>
           {flexRow(
             <>
               {renderInput(
                 "basePrice",
                 "Base Price",
                 "number",
-                "Enter base price"
+                "Enter base price",
               )}
               {renderInput(
                 "discountPercentage",
-                "Discount Percentage",
+                "Discount %",
                 "number",
-                "Enter discount %"
+                "Enter discount %",
               )}
               {renderInput(
-                "Actual Price",
+                "discountPrice",
                 "Discount Price",
                 "number",
-                "Enter discounted price"
+                "Enter discounted price",
               )}
-            </>
+            </>,
           )}
 
           <hr />
 
-          <h3 className="uploadpage-section-title" style={{ marginTop: 8 }}>
-            Inventory
-          </h3>
-          {flexRow(
-            <>
-              {renderInput(
-                "productId",
-                "Product ID",
-                "text",
-                "Enter product ID"
-              )}
-              {renderInput("category", "Category", "text", "Enter category")}
-            </>
-          )}
-
           <div className="my-inventory-section">
             <h3 className="uploadpage-section-title">Size</h3>
+
             {flexRow(
               <>
-                {renderInput("stockM", "Stock M", "number", "Enter stock")}
-                {renderInput("stockL", "Stock L", "number", "Enter stock")}
-              </>
+                {renderInput("stockM", "Stock M", "number")}
+                {renderInput("stockL", "Stock L", "number")}
+              </>,
             )}
+
             {flexRow(
               <>
-                {renderInput("stockXL", "Stock XL", "number", "Enter stock")}
-                {renderInput("stockXXL", "Stock XXL", "number", "Enter stock")}
-              </>
+                {renderInput("stockXL", "Stock XL", "number")}
+                {renderInput("stockXXL", "Stock XXL", "number")}
+              </>,
             )}
 
             <div className="my-total-stock">
-              <h4 className="uploadpage-subtitle">Total stock</h4>
+              <h4 className="uploadpage-subtitle">Total Stock</h4>
               <input
                 type="number"
-                id="totalStock"
                 className="my-input-feild"
-                placeholder="Enter the stock according to the size"
+                placeholder="Enter total stock"
               />
             </div>
           </div>
         </div>
 
-        {/* ---------- Right Side Color Section ---------- */}
+        {/* ---------------- RIGHT SIDE (COLOR SECTION) ---------------- */}
         <div className="my-color-section">
-          <h3>Select color</h3>
+          <h3>Select Color</h3>
+
           <div className="my-color-input-row">
             <input
               type="text"
-              placeholder="Type color name & press Enter"
+              placeholder="Color name"
               value={colorInput}
               onChange={(e) => setColorInput(e.target.value)}
               className="my-color-input"
             />
 
-            <label className="my-upload-btn">
-              Upload
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file && colorInput.trim()) {
-                    const newColor = {
-                      name: colorInput.trim(),
-                      image: { file, url: URL.createObjectURL(file) },
-                    };
-                    setColors((prev) => [...prev, newColor]);
-                    setImagesByColor((prev) => ({
-                      ...prev,
-                      [newColor.name]: [],
-                    }));
-                    setColorInput("");
-                  }
-                }}
-              />
-            </label>
-
-            <button
-              className="my-ok-btn"
-              onClick={() => {
-                handleAddColor(colorInput.trim());
-                setColorInput("");
+            <input
+              type="color"
+              value={colorHex}
+              onChange={(e) => setColorHex(e.target.value)}
+              style={{
+                width: 50,
+                height: 40,
+                border: "none",
+                cursor: "pointer",
               }}
-            >
-              OK
+            />
+
+            <button className="my-ok-btn" onClick={handleAddColor}>
+              Add
             </button>
           </div>
 
-          {/* Color Blocks */}
+          {/* ----------- COLOR CARDS ----------- */}
           {colors.map((color) => (
             <div key={color.name} className="my-color-card">
               <div className="my-color-header">
                 <div className="my-color-title">
                   <h4>{color.name}</h4>
-                  {color.image && (
-                    <img
-                      src={color.image.url}
-                      alt={color.name}
-                      className="my-color-thumbnail"
-                    />
-                  )}
+
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      backgroundColor: color.hex,
+                      border: "2px solid #ddd",
+                    }}
+                  />
                 </div>
 
                 <button
                   className="my-delete-btn"
-                  onClick={() => {
-                    setColors((prev) =>
-                      prev.filter((c) => c.name !== color.name)
-                    );
-                    setImagesByColor((prev) => {
-                      const newImages = { ...prev };
-                      delete newImages[color.name];
-                      return newImages;
-                    });
-                  }}
+                  onClick={() => handleRemoveColor(color.name)}
                 >
                   Delete
                 </button>
               </div>
 
-              {/* Extra Images */}
+              {/* ----------- IMAGES PER COLOR ----------- */}
               <div className="my-image-list">
                 {imagesByColor[color.name]?.map((img, index) => (
                   <div key={index} className="my-image-box">
                     <img src={img.url} alt="preview" className="my-image" />
                     <button
                       className="my-remove-img-btn"
-                      onClick={() => handleRemove(color.name, index)}
+                      onClick={() => handleRemoveImage(color.name, index)}
                     >
                       ×
                     </button>
@@ -256,22 +241,23 @@ const UploadProductDetails = () => {
             </div>
           ))}
         </div>
+
+        {/* ---------------- SUBMIT BUTTON ---------------- */}
       </div>
       <div
         style={{
-          flex: 1,
-          alignItems: "center",
+          textAlign: "center",
           backgroundColor: "grey",
-          justifyContent: "center",
           padding: 12,
           borderRadius: 24,
           margin: "20px 30px",
+          cursor: "pointer",
         }}
       >
         ADD PRODUCT
       </div>
-    </div>
+    </>
   );
 };
 
-export default UploadProductDetails;
+export default UploadShirts;
