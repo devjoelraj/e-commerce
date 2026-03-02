@@ -116,7 +116,7 @@ const Header = () => {
               location.pathname === "/add-to-cart" ? "active-cart" : ""
             }`}
             title="Cart"
-            onClick={() => navigate("/add-to-cart")}
+            onClick={() => navigate("/AddToCart")}
           />
 
           <FaUserCircle

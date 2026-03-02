@@ -61,3 +61,5 @@ export const logoutUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const SignUp = async (req, res, next) => {};

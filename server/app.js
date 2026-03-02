@@ -8,6 +8,7 @@ import { frontendUrl, nodeEnv } from "./src/config/env.config.js";
 import { errorHandler, notFound } from "./src/middlewares/errorMiddleware.js";
 import { globalLimiter } from "./src/middlewares/rateLimit.middleware.js";
 import authRoutes from "./src/routes/auth.routes.js";
+import adminRouter from "./src/routes/admin.routes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(
   cors({
     origin: frontendUrl,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   }),
 );
 app.use(express.json());
@@ -26,6 +28,7 @@ if (nodeEnv === "development") {
 }
 app.use(globalLimiter);
 app.use("/auth", authRoutes);
+app.use("/admin", adminRouter);
 app.use(notFound);
 app.use(errorHandler);
 

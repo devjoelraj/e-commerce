@@ -2,19 +2,27 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      trim: true,
+    },
     email: {
       type: String,
       unique: true,
       sparse: true,
+      lowercase: true,
     },
     phone: {
       type: String,
       unique: true,
       sparse: true,
     },
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+    },
     password: {
       type: String,
-      required: true,
     },
     role: {
       type: String,
@@ -27,6 +35,13 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["PENDING", "ACTIVE", "SUSPENDED"],
+      default: "PENDING",
+    },
+    otp: String,
+    otpExpires: Date,
     lockUntil: Date,
   },
   { timestamps: true },
