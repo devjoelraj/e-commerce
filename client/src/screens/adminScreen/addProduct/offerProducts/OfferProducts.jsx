@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import ContinueButton from "../../../../../components/buttons/ContinueButton";
-import presentToast from "../../../../../components/Toast/Toast";
+import ContinueButton from "../../../../components/buttons/ContinueButton";
+import presentToast from "../../../../components/Toast/Toast";
 
 const dummyProducts = [
   { id: 1, name: "linen shirts", price: 800 },

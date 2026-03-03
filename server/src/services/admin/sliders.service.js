@@ -29,32 +29,6 @@ export const createSliderService = async ({ files, orders }) => {
   return sliders;
 };
 
-export const replaceSliderImageService = async ({ id, fileBuffer, order }) => {
-  const currentSlider = await Slider.findById(id);
-  if (!currentSlider) throw new Error("Slider not found");
-
-  const existingSliderWithOrder = await Slider.findOne({
-    order,
-    _id: { $ne: id },
-  });
-
-  if (existingSliderWithOrder) {
-    await deleteFromCloudinary(existingSliderWithOrder.publicId);
-    await Slider.findByIdAndDelete(existingSliderWithOrder._id);
-  }
-
-  await deleteFromCloudinary(currentSlider.publicId);
-
-  const uploaded = await uploadToCloudinary(fileBuffer);
-
-  currentSlider.imageUrl = uploaded.imageUrl;
-  currentSlider.publicId = uploaded.publicId;
-  currentSlider.order = order;
-
-  await currentSlider.save();
-
-  return currentSlider;
-};
 export const deleteSliderService = async (id) => {
   const slider = await Slider.findById(id);
   if (!slider) throw new Error("Slider not found");
@@ -64,4 +38,29 @@ export const deleteSliderService = async (id) => {
   await slider.deleteOne();
 
   return true;
+};
+
+export const getAllSlidersService = async () => {
+  return await Slider.find().sort({ order: 1 });
+};
+
+export const reorderSlidersService = async (updates) => {
+  if (!Array.isArray(updates)) {
+    throw new Error("Payload must be an array");
+  }
+
+  const orders = updates.map((u) => u.newOrder);
+  if (new Set(orders).size !== orders.length) {
+    throw new Error("Duplicate order values are not allowed");
+  }
+
+  const ops = updates.map((u) => ({
+    updateOne: {
+      filter: { _id: u.id },
+      update: { $set: { order: u.newOrder } },
+    },
+  }));
+
+  await Slider.bulkWrite(ops);
+  return await Slider.find().sort({ order: 1 });
 };

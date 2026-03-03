@@ -7,17 +7,16 @@ import AddToCart from "./screens/userScreens/addToCart/AddToCart";
 import Profile from "./screens/userScreens/profile/Profile";
 import AdminDashBoardHome from "./screens/adminScreen/adminDashboard/AdminDashboard";
 import AdminLayout from "./screens/adminScreen/layout";
-import AddProduct from "./screens/adminScreen/adminDashboard/addProduct/AddProduct";
-import OrdersPage from "./screens/adminScreen/adminDashboard/ordersPage";
-import AllProducts from "./screens/adminScreen/adminDashboard/allProducts";
-import DashboardSilders from "./screens/adminScreen/adminDashboard/addProduct/dashboardSilders/DashboardSilders";
-import OfferProducts from "./screens/adminScreen/adminDashboard/addProduct/offerProducts/OfferProducts";
-import UploadPants from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/pants/UploadPants";
-import UploadAccessiors from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/accessiors/UploadAccessiors";
-import FootWears from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/footwears/UploadFootwears";
-import UploadShirts from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/shirts/UploadShirts";
-import UploadProducts from "./screens/adminScreen/adminDashboard/addProduct/UploadProduct/products/Products";
-
+import AddProduct from "./screens/adminScreen/addProduct/AddProduct";
+import OrdersPage from "./screens/adminScreen/ordersPage";
+import DashboardSilders from "./screens/adminScreen/addProduct/dashboardSilders/DashboardSilders";
+import OfferProducts from "./screens/adminScreen/addProduct/offerProducts/OfferProducts";
+import UploadPants from "./screens/adminScreen/addProduct/UploadProduct/products/pants/UploadPants";
+import UploadAccessiors from "./screens/adminScreen/addProduct/UploadProduct/products/accessiors/UploadAccessiors";
+import FootWears from "./screens/adminScreen/addProduct/UploadProduct/products/footwears/UploadFootwears";
+import UploadShirts from "./screens/adminScreen/addProduct/UploadProduct/products/shirts/UploadShirts";
+import UploadProducts from "./screens/adminScreen/addProduct/UploadProduct/products/Products";
+import AllProducts from "./screens/adminScreen/allProducts";
 const Login = lazy(() => import("./screens/authScreens/login/Login"));
 const Otp = lazy(() => import("./screens/authScreens/otp/Otp"));
 const ForgetPassword = lazy(

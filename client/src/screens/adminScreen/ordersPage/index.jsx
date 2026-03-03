@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./OrdersPage.css";
-import presentToast from "../../../../components/Toast/Toast";
+import presentToast from "../../../components/Toast/Toast";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([

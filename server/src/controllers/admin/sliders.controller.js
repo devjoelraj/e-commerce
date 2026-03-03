@@ -2,6 +2,8 @@ import {
   createSliderService,
   deleteSliderService,
   replaceSliderImageService,
+  getAllSlidersService,
+  reorderSlidersService,
 } from "../../services/admin/sliders.service.js";
 
 export const createSlider = async (req, res) => {
@@ -29,15 +31,21 @@ export const createSlider = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-export const replaceSliderImage = async (req, res) => {
-  try {
-    const slider = await replaceSliderImageService({
-      id: req.params.id,
-      fileBuffer: req.file.buffer,
-      order: req.body.order,
-    });
 
-    res.json({ success: true, data: slider });
+export const getSliders = async (req, res) => {
+  try {
+    const sliders = await getAllSlidersService();
+    res.json({ success: true, data: sliders });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const reorderSliders = async (req, res) => {
+  try {
+    const payload = req.body;
+    const sliders = await reorderSlidersService(payload);
+    res.json({ success: true, data: sliders });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
