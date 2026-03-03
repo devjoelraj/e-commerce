@@ -1,0 +1,38 @@
+.pants-size-section {
+  margin-top: 20px;
+}
+
+.pants-size-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.pants-size-card {
+  background: #f8f9ff;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #e2e4f5;
+  transition: 0.3s ease;
+}
+
+.pants-size-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+.pants-size-card label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.pants-size-input {
+  width: 100%;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  text-align: center;
+}

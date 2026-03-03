@@ -1,0 +1,30 @@
+.upload-products-container {
+  padding: 30px;
+}
+
+.category-buttons {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.category-buttons button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #8864f0;
+  color: white;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.category-buttons button:hover {
+  background-color: #6f4ed8;
+}
+
+.upload-section {
+  margin-top: 20px;
+}

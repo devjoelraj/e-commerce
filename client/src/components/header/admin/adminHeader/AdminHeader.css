@@ -14,16 +14,17 @@
 .admin-header-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 10px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 16px 0;
 }
 
-.admin-logo {
+/* .admin-logo {
   height: 40px;
   width: auto;
-}
+} */
 
 .admin-company-name {
   font-size: 18px;

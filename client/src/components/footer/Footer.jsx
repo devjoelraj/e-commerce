@@ -33,7 +33,6 @@ const Footer = () => {
               <li className="footer-item">Home</li>
               <li className="footer-item">Shop</li>
               <li className="footer-item">Mens</li>
-              <li className="footer-item">Womens</li>
               <li className="footer-item">Trends</li>
             </ul>
           </div>

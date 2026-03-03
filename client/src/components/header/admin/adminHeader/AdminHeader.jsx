@@ -1,5 +1,5 @@
 import React from "react";
-import "./AdminHeader.css"; // Make sure this path is correct
+import "./AdminHeader.css";
 
 const AdminHeader = () => {
   return (
@@ -7,7 +7,7 @@ const AdminHeader = () => {
       <div className="admin-header-content">
         <img src="/logo.png" alt="logo" className="admin-logo" />
         <p className="admin-company-name">Company Name</p>
-        <button className="admin-profile-button">Profile</button>
+        {/* <button className="admin-profile-button">Profile</button> */}
       </div>
     </header>
   );

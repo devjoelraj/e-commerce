@@ -12,37 +12,64 @@ import {
 import "./Header.css";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const Header = ({ scrollToDeals }) => {
+const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState(null);
 
-  const navItems = ["All", "Deals", "Mens", "Womens", "Trends"];
+  const navItems = ["Home", "Deals", "Trends", "Shirts", "Pants"];
+
+  const sidebarItems = [
+    "Home",
+    "Deals",
+    "Trends",
+    "Shirts",
+    "Pants",
+    "Accessories",
+    "footwears",
+  ];
 
   const dropdownSections = {
-    Mens: ["Shirts", "Shoes", "Accessories"],
-    Womens: ["Dresses", "Bags", "Heels"],
+    footwears: ["shoe", "silppers"],
+    Accessories: ["Watch", "Chains", "Rings"],
   };
 
   const handleNavigation = (item) => {
-    const lowerItem = item.toLowerCase();
+    setSidebarOpen(false);
+    setOpenSection(null);
 
-    if (item === "Deals") {
-      navigate("/user-dashboard", { state: { scrollToDeals: true } });
-    } else if (item === "Trends") {
-      navigate("/ProductLists", { state: { data: item } });
-    } else if (item === "All") {
-      navigate("/user-dashboard");
-    } else if (lowerItem === "mens" || lowerItem === "womens") {
-      navigate("/ProductLists", { state: { data: item } });
-    } else if (item.includes(" - ")) {
+    if (item.includes(" - ")) {
       const [section, category] = item.split(" - ");
-      navigate("/ProductLists", { state: { data: section, category } });
+      navigate("/ProductLists", {
+        state: { data: section, category },
+      });
+      return;
     }
 
-    setSidebarOpen(false);
+    switch (item) {
+      case "Home":
+        navigate("/user-dashboard");
+        break;
+
+      case "Deals":
+        navigate("/user-dashboard", {
+          state: { scrollToDeals: true },
+        });
+        break;
+
+      case "Trends":
+        navigate("/ProductLists", {
+          state: { data: "Trends" },
+        });
+        break;
+
+      default:
+        navigate("/ProductLists", {
+          state: { data: item },
+        });
+    }
   };
 
   const toggleSidebar = () => {
@@ -57,7 +84,14 @@ const Header = ({ scrollToDeals }) => {
   return (
     <header className="header">
       <div className="top-nav">
-        <img src="/logo.png" alt="logo" className="logo" />
+        <img
+          src="/logo.png"
+          alt="logo"
+          className="logo"
+          onClick={() => navigate("/user-dashboard")}
+          style={{ cursor: "pointer" }}
+        />
+
         <div className="search-wrapper">
           <input
             type="text"
@@ -67,33 +101,37 @@ const Header = ({ scrollToDeals }) => {
           />
           <FaSearch className="search-icon" />
         </div>
+
         <div className="icons-wrapper">
           <FaHeart
             className={`icon ${
-              location.pathname === "/WatchList" ? "active-cart" : ""
+              location.pathname === "/watchlist" ? "active-cart" : ""
             }`}
             title="Wishlist"
-            onClick={() => navigate("/WatchList")}
+            onClick={() => navigate("/watchlist")}
           />
+
           <FaShoppingCart
             className={`icon ${
-              location.pathname === "/AddToCart" ? "active-cart" : ""
+              location.pathname === "/add-to-cart" ? "active-cart" : ""
             }`}
             title="Cart"
             onClick={() => navigate("/AddToCart")}
           />
+
           <FaUserCircle
             className={`icon ${
-              location.pathname === "/Profile" ? "active-cart" : ""
+              location.pathname === "/profile" ? "active-cart" : ""
             }`}
             title="Profile"
-            onClick={() => navigate("/Profile")}
+            onClick={() => navigate("/profile")}
           />
         </div>
       </div>
 
       <div className="bottom-nav">
         <FaBars className="burger-icon" onClick={toggleSidebar} />
+
         {navItems.map((item) => (
           <span
             key={item}
@@ -112,7 +150,7 @@ const Header = ({ scrollToDeals }) => {
             <h3>Categories</h3>
           </div>
 
-          {navItems.map((item) =>
+          {sidebarItems.map((item) =>
             dropdownSections[item] ? (
               <div key={item} className="sidebar-section has-dropdown">
                 <div
@@ -122,11 +160,9 @@ const Header = ({ scrollToDeals }) => {
                   {item}
                   {openSection === item ? <FaChevronUp /> : <FaChevronDown />}
                 </div>
+
                 {openSection === item && (
-                  <div
-                    className="accordion-content"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <div className="accordion-content">
                     {dropdownSections[item].map((subItem) => (
                       <p
                         key={subItem}
@@ -146,7 +182,7 @@ const Header = ({ scrollToDeals }) => {
               >
                 {item}
               </div>
-            )
+            ),
           )}
         </div>
       )}
