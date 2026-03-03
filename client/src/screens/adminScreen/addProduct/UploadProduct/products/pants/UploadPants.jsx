@@ -57,7 +57,14 @@ const UploadPants = () => {
   };
 
   // ---------- REUSABLE INPUT ----------
-  const renderInput = (id, label, type = "text", placeholder = "") => (
+  const renderInput = (
+    id,
+    label,
+    type = "text",
+    placeholder = "",
+    value = "",
+    onChange = () => {},
+  ) => (
     <div className="uploadpage-form-group">
       <label htmlFor={id} className="uploadpage-label">
         {label}
@@ -67,6 +74,8 @@ const UploadPants = () => {
         type={type}
         className="my-input-feild"
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
       />
     </div>
   );
