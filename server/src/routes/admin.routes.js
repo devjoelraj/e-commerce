@@ -5,22 +5,20 @@ import {
   createSlider,
   deleteSlider,
   getSliders,
-  reorderSliders,
 } from "../controllers/admin/sliders.controller.js";
 import {
   createPantsProduct,
   getPantsProducts,
-  getPantsProductById,
   updatePantsProduct,
   deletePantsProduct,
   deleteProductImage,
+  addColorVariantController,
 } from "../controllers/admin/addProduct/pants.controller.js";
 
 const router = express.Router();
 
 router.post("/sliderUpload", upload.array("file"), createSlider);
 router.get("/sliderUpload", getSliders);
-router.put("/sliderUpload/reorder", express.json(), reorderSliders);
 router.delete("/sliderUpload/:id", deleteSlider);
 
 router.post(
@@ -30,6 +28,11 @@ router.post(
 );
 router.get("/pants", getPantsProducts);
 router.put("/pants/:id", express.json(), updatePantsProduct);
+router.post(
+  "/pants/colorVariant/:id",
+  upload.array("file"),
+  addColorVariantController,
+);
 router.delete("/pants/:id", deletePantsProduct);
 router.post("/pants/image/delete", express.json(), deleteProductImage);
 

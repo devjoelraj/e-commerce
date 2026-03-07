@@ -1,7 +1,7 @@
 import apiClient from "../apiClient";
 export const postSildersContentService = async (bodyContent) => {
   try {
-    const response = await apiClient.post("/admin/slidersUpload", bodyContent);
+    const response = await apiClient.post("/admin/sliderUpload", bodyContent);
     if (response?.status === 201) {
       return response?.data;
     }
@@ -12,25 +12,11 @@ export const postSildersContentService = async (bodyContent) => {
 };
 export const deleteSildersContentService = async (id) => {
   try {
-    const response = await apiClient.delete(`/admin/slidersUpload/${id}`);
-    if (response?.status === 201) {
+    const response = await apiClient.delete(`/admin/sliderUpload/${id}`);
+    if (response?.status === 200) {
       return response?.data;
     }
     return { success: false, message: "Failed to delete slider" };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-export const reorderSildersContentService = async (bodyContent) => {
-  try {
-    const response = await apiClient.put(
-      "/admin/slidersUpload/reorder",
-      bodyContent,
-    );
-    if (response?.status === 201) {
-      return response?.data;
-    }
-    return { success: false, message: "Failed to reorder sliders" };
   } catch (error) {
     return { success: false, message: error.message };
   }
@@ -55,6 +41,21 @@ export const updatePantsProductService = async (id, bodyContent) => {
       return response?.data;
     }
     return { success: false, message: "Failed to update pants product" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const addExistingPantsVariantService = async (id, bodyContent) => {
+  try {
+    const response = await apiClient.post(
+      `/admin/pants/colorVariant/${id}`,
+      bodyContent,
+    );
+    if (response?.status === 200) {
+      return response?.data;
+    }
+    return { success: false, message: "Failed to add color variant" };
   } catch (error) {
     return { success: false, message: error.message };
   }

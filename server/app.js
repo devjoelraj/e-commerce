@@ -9,6 +9,7 @@ import { errorHandler, notFound } from "./src/middlewares/errorMiddleware.js";
 import { globalLimiter } from "./src/middlewares/rateLimit.middleware.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import adminRouter from "./src/routes/admin.routes.js";
+import userRouter from "./src/routes/user.routes.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ if (nodeEnv === "development") {
 app.use(globalLimiter);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRouter);
+app.use("/user", userRouter);
 app.use(notFound);
 app.use(errorHandler);
 

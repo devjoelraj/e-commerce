@@ -71,7 +71,7 @@ function App() {
           </Route>
 
           <Route path="/user-dashboard" element={<UserDashboard />} />
-          <Route path="/ProductDetails" element={<ProductDetails />} />
+          <Route path="/ProductDetails/:id" element={<ProductDetails />} />
           <Route path="/ProductLists" element={<ProductLists />} />
           <Route path="/WatchList" element={<WatchList />} />
           <Route path="/AddToCart" element={<AddToCart />} />

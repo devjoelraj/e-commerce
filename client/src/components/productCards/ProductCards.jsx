@@ -9,16 +9,23 @@ const ProductCards = ({
   startValue = 3,
   reviewsCount = 64,
   image = "https://picsum.photos/200/300",
+  onClick,
 }) => {
   return (
-    <div className="product-card">
+    <div
+      className="product-card"
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+    >
       <div className="product-header">
         <FaHeart className="heart-icon" title="Add to Wishlist" />
       </div>
+
       <img src={image} alt="product" className="product-image" />
 
       <div className="product-info">
         <h3 className="product-name">{productname}</h3>
+
         <p className="product-description">
           <del>${discountValue}</del> ${actualValue}
         </p>

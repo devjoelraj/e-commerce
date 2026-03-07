@@ -13,6 +13,7 @@ const sliderSchema = new mongoose.Schema(
     order: {
       type: Number,
       required: true,
+      unique: true,
     },
   },
   { timestamps: true },

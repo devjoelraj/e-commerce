@@ -1,12 +1,21 @@
 .product-card {
   width: 100%;
-  max-width: 240px;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  margin: 15px auto;
   position: relative;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  transition: 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .product-header {
@@ -14,7 +23,8 @@
   right: 0;
   display: flex;
   justify-content: flex-end;
-  padding: 8px;
+  padding: 10px;
+  z-index: 2;
 }
 
 .heart-icon {
@@ -25,20 +35,22 @@
 
 .product-image {
   width: 100%;
-  height: auto;
-  max-height: 200px;
+  height: 200px;
   object-fit: cover;
 }
 
 .product-info {
-  padding: 10px 15px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .product-name {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: #2c2c2c;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .product-description {
@@ -51,11 +63,11 @@
   background-color: #8864f0;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 9px 12px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-weight: 600;
+  margin-bottom: 10px;
   width: 100%;
 }
 
@@ -64,26 +76,28 @@
 }
 
 .product-rating {
-  font-size: 1rem;
+  margin-top: auto;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
-@media (max-width: 768px) {
+.review-count {
+  margin-left: 5px;
+  color: #555;
+}
+
+ @media (max-width: 768px) {
+  .product-image {
+    height: 180px;
+  }
+
   .product-name {
     font-size: 1rem;
   }
 
-  .product-description {
-    font-size: 0.85rem;
-  }
-
   .add-to-cart {
-    font-size: 0.9rem;
-  }
-
-  .product-rating {
     font-size: 0.9rem;
   }
 }
