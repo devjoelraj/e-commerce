@@ -1,15 +1,15 @@
 import {
-  getPantsProductsService,
-  updatePantsProductService,
-  deletePantsProductService,
+  getShirtsProductsService,
+  updateShirtsProductService,
+  deleteShirtsProductService,
   deleteProductImageService,
-  createPantsProductService,
+  createShirtsProductService,
   addColorVariantService,
-} from "../../../services/admin/addProduct/pants.service.js";
+} from "../../../services/admin/addProduct/shirts.service.js";
 
-export const createPantsProduct = async (req, res) => {
+export const createShirtsProduct = async (req, res) => {
   try {
-    if (!req.files.file || req.files.file.length === 0) {
+    if (!req.files?.file || req.files.file.length === 0) {
       return res.status(400).json({
         message: "At least one image is required",
       });
@@ -25,23 +25,23 @@ export const createPantsProduct = async (req, res) => {
     } = req.body;
 
     let parsedColors = colors;
-
     if (typeof colors === "string") {
-      parsedColors = JSON.parse(colors);
+      try {
+        parsedColors = JSON.parse(colors);
+      } catch (e) {
+        return res.status(400).json({ message: "Invalid colors format" });
+      }
     }
 
     const colorImages = {};
-
     parsedColors.forEach((color) => {
       colorImages[color.name] = [];
     });
-
-    // Since only one color, assign all files to it
     if (parsedColors.length > 0) {
       colorImages[parsedColors[0].name] = req.files.file;
     }
 
-    const pantsProduct = await createPantsProductService({
+    const shirtsProduct = await createShirtsProductService({
       productName,
       description,
       basePrice,
@@ -54,11 +54,12 @@ export const createPantsProduct = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Pants product created successfully",
-      data: pantsProduct,
+      message: "Shirts product created successfully",
+      data: shirtsProduct,
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
@@ -69,9 +70,7 @@ export const addColorVariantController = async (req, res) => {
     const productId = req.params.id;
     const files = req.files;
     const { colors } = req.body;
-    console.log("BODY:", req.body);
-    console.log("FILES:", req.files);
-    console.log("PARAMS:", req.params);
+
     const product = await addColorVariantService(productId, colors, files);
 
     res.status(200).json({
@@ -81,14 +80,14 @@ export const addColorVariantController = async (req, res) => {
     });
   } catch (error) {
     console.error("Add Color Variant Error:", error);
-
     res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
-export const getPantsProducts = async (req, res) => {
+
+export const getShirtsProducts = async (req, res) => {
   try {
     const { isActive } = req.query;
     const filters = {};
@@ -96,7 +95,7 @@ export const getPantsProducts = async (req, res) => {
       filters.isActive = isActive === "true";
     }
 
-    const products = await getPantsProductsService(filters);
+    const products = await getShirtsProductsService(filters);
     res.json({
       success: true,
       count: products.length,
@@ -107,7 +106,7 @@ export const getPantsProducts = async (req, res) => {
   }
 };
 
-export const updatePantsProduct = async (req, res) => {
+export const updateShirtsProduct = async (req, res) => {
   try {
     let { sizes, colors, totalQuantity } = req.body;
 
@@ -127,18 +126,17 @@ export const updatePantsProduct = async (req, res) => {
     }
 
     const updateData = { ...req.body, sizes, colors };
-
     if (totalQuantity !== undefined) {
       updateData.totalQuantity = Number(totalQuantity);
     }
 
-    const updatedProduct = await updatePantsProductService(
+    const updatedProduct = await updateShirtsProductService(
       req.params.id,
       updateData,
     );
     res.json({
       success: true,
-      message: "Pants product updated successfully",
+      message: "Shirts product updated successfully",
       data: updatedProduct,
     });
   } catch (error) {
@@ -176,11 +174,11 @@ export const deleteProduct = async (req, res) => {
         });
       }
 
-      await deletePantsProductService(idToDelete);
+      await deleteShirtsProductService(idToDelete);
 
       return res.json({
         success: true,
-        message: "Pants product deleted successfully",
+        message: "Shirts product deleted successfully",
       });
     }
   } catch (error) {

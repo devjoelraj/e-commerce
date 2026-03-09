@@ -1,39 +1,106 @@
 import express from "express";
-
 import upload from "../middlewares/multer.js";
+
+// Slider controllers
 import {
   createSlider,
   deleteSlider,
   getSliders,
-} from "../controllers/admin/sliders.controller.js";
+} from "../controllers/admin/addProduct/sliders.controller.js";
+
+// Pants controllers
 import {
   createPantsProduct,
   getPantsProducts,
   updatePantsProduct,
-  deletePantsProduct,
-  deleteProductImage,
-  addColorVariantController,
+  addColorVariantController as addPantsColorVariant,
+  deleteProduct as deletePantsProduct,
 } from "../controllers/admin/addProduct/pants.controller.js";
+
+// Shirts controllers
+import {
+  createShirtsProduct,
+  getShirtsProducts,
+  updateShirtsProduct,
+  addColorVariantController as addShirtsColorVariant,
+  deleteProduct as deleteShirtsProduct,
+} from "../controllers/admin/addProduct/shirts.controller.js";
+
+//footwear controllers
+import {
+  createShoesProduct,
+  getShoesProducts,
+  updateShoesProduct,
+  addColorVariantController as addShoesColorVariant,
+  deleteProduct as deleteShoesProduct,
+} from "../controllers/admin/addProduct/footWear.controller.js";
 
 const router = express.Router();
 
+// ========== Slider Routes ==========
 router.post("/sliderUpload", upload.array("file"), createSlider);
 router.get("/sliderUpload", getSliders);
 router.delete("/sliderUpload/:id", deleteSlider);
 
+// ========== Pants Routes ==========
 router.post(
   "/pantsUpload",
   upload.fields([{ name: "file", maxCount: 50 }]),
   createPantsProduct,
 );
 router.get("/pants", getPantsProducts);
-router.put("/pants/:id", express.json(), updatePantsProduct);
+router.put("/pants/:id", updatePantsProduct);
 router.post(
   "/pants/colorVariant/:id",
   upload.array("file"),
-  addColorVariantController,
+  addPantsColorVariant,
 );
-router.delete("/pants/:id", deletePantsProduct);
-router.post("/pants/image/delete", express.json(), deleteProductImage);
+router.post("/pants/delete", deletePantsProduct);
+
+// ========== Shirts Routes ==========
+router.post(
+  "/shirtsUpload",
+  upload.fields([{ name: "file", maxCount: 50 }]),
+  createShirtsProduct,
+);
+router.get("/shirts", getShirtsProducts);
+router.put("/shirts/:id", updateShirtsProduct);
+router.post(
+  "/shirts/colorVariant/:id",
+  upload.array("file"),
+  addShirtsColorVariant,
+);
+router.post("/shirts/delete", deleteShirtsProduct);
+
+// ========== footwear Routes ==========
+
+router.post(
+  "/shoesUpload",
+  upload.fields([{ name: "file", maxCount: 50 }]),
+  createShoesProduct,
+);
+router.get("/shoes", getShoesProducts);
+router.put("/shoes/:id", updateShoesProduct);
+router.post(
+  "/shoes/colorVariant/:id",
+  upload.array("file"),
+  addShoesColorVariant,
+);
+router.post("/shoes/delete", deleteShoesProduct);
+
+// ========== Accessories Routes ==========
+router.post(
+  "/accessoriesUpload",
+  upload.fields([{ name: "file", maxCount: 50 }]),
+  createAccessoriesProduct,
+);
+router.get("/accessories", getAccessoriesProducts);
+router.put("/accessories/:id", updateAccessoriesProduct);
+router.post(
+  "/accessories/colorVariant/:id",
+  upload.array("file"),
+  addAccessoriesColorVariant,
+);
+router.post("/accessories/delete", deleteAccessoriesProduct);
 
 export default router;

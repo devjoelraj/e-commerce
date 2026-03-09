@@ -1,8 +1,8 @@
-import Slider from "../../models/admin/uploadSlider.model.js";
+import Slider from "../../../models/admin/addProduct/uploadSlider.model.js";
 import {
   uploadToCloudinary,
   deleteFromCloudinary,
-} from "../../utils/cloudinary.util.js";
+} from "../../../utils/cloudinary.util.js";
 
 export const createSliderService = async ({ files, orders }) => {
   if (files.length !== orders.length) {

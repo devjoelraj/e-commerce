@@ -23,3 +23,41 @@ export const getPantsProductByIdService = async (id) => {
     return { success: false, message: error.message };
   }
 };
+
+export const getAccessoriesProductsService = async (type = null) => {
+  try {
+    const params = type ? { type } : {};
+    const response = await apiClient.get("/admin/accessories", { params });
+    if (response?.status === 200) {
+      return response?.data;
+    }
+    return { success: false, message: "Failed to fetch accessories products" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const getShirtsProductsService = async (params = {}) => {
+  try {
+    const response = await apiClient.get("/admin/shirts", { params });
+    if (response?.status === 200) {
+      return response?.data;
+    }
+    return { success: false, message: "Failed to fetch shirts products" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const getFootwearProductsService = async (type = null) => {
+  try {
+    const params = type ? { type } : {};
+    const response = await apiClient.get("/admin/shoes", { params });
+    if (response?.status === 200) {
+      return response?.data;
+    }
+    return { success: false, message: "Failed to fetch footwear products" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};

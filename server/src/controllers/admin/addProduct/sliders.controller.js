@@ -2,7 +2,7 @@ import {
   createSliderService,
   deleteSliderService,
   getAllSlidersService,
-} from "../../services/admin/sliders.service.js";
+} from "../../../services/admin/addProduct/sliders.service.js";
 
 export const createSlider = async (req, res) => {
   try {

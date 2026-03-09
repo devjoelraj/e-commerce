@@ -4,6 +4,10 @@ import ProductCards from "../productCards/ProductCards";
 import Header from "../header/userHeader/Header";
 import { getPantsProductsService } from "../../api/userServices/productsServices";
 import "./productLists.css";
+import {
+  getFootwearProductsService,
+  getShirtsProductsService,
+} from "../../api/userServices/userDashboard";
 
 const ProductLists = () => {
   const location = useLocation();
@@ -16,11 +20,21 @@ const ProductLists = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        let response;
         if (category === "Pants") {
-          const response = await getPantsProductsService();
-          if (response?.success) {
-            setProducts(response.data);
-          }
+          response = await getPantsProductsService();
+        } else if (category === "Shirts") {
+          response = await getShirtsProductsService();
+        } else if (category === "Shoes" || category === "Slippers") {
+          const type = category === "Shoes" ? "shoe" : "slipper";
+          response = await getFootwearProductsService(type);
+        } else {
+          setProducts([]);
+          return;
+        }
+
+        if (response?.success) {
+          setProducts(response.data);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
