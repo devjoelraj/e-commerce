@@ -24,6 +24,7 @@ import {
   updateShirtsProduct,
   addColorVariantController as addShirtsColorVariant,
   deleteProduct as deleteShirtsProduct,
+  getShirtsProductById,
 } from "../controllers/admin/addProduct/shirts.controller.js";
 
 //footwear controllers
@@ -33,7 +34,16 @@ import {
   updateShoesProduct,
   addColorVariantController as addShoesColorVariant,
   deleteProduct as deleteShoesProduct,
+  getFootwearProductById,
 } from "../controllers/admin/addProduct/footWear.controller.js";
+import {
+  createAccessoriesProduct,
+  getAccessoriesProductById,
+  getAccessoriesProducts,
+  updateAccessoriesProduct,
+  addColorVariantController as addAccessoriesColorVariant,
+  deleteProduct as deleteAccessoriesProduct,
+} from "../controllers/admin/addProduct/accessories.controller.js";
 
 const router = express.Router();
 
@@ -65,6 +75,8 @@ router.post(
 );
 router.get("/shirts", getShirtsProducts);
 router.put("/shirts/:id", updateShirtsProduct);
+router.get("/shirts/:id", getShirtsProductById);
+
 router.post(
   "/shirts/colorVariant/:id",
   upload.array("file"),
@@ -79,6 +91,8 @@ router.post(
   upload.fields([{ name: "file", maxCount: 50 }]),
   createShoesProduct,
 );
+router.get("/footwear/:id", getFootwearProductById);
+
 router.get("/shoes", getShoesProducts);
 router.put("/shoes/:id", updateShoesProduct);
 router.post(
@@ -94,6 +108,7 @@ router.post(
   upload.fields([{ name: "file", maxCount: 50 }]),
   createAccessoriesProduct,
 );
+router.get("/accessories/:id", getAccessoriesProductById);
 router.get("/accessories", getAccessoriesProducts);
 router.put("/accessories/:id", updateAccessoriesProduct);
 router.post(

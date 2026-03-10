@@ -185,3 +185,17 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getShirtsProductById = async (req, res) => {
+  try {
+    const product = await getShirtsProductByIdService(req.params.id);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+    res.json({ success: true, data: product });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

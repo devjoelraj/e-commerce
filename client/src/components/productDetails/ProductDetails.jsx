@@ -1,31 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom"; // 👈 new imports
+import { useLocation, useParams } from "react-router-dom";
 import { FaHeart, FaStar } from "react-icons/fa";
 import "./ProductDetails.css";
 import Header from "../header/userHeader/Header";
 import { getPantsProductByIdService } from "../../api/userServices/productsServices";
+import {
+  getAccessoriesProductByIdService,
+  getFootwearProductByIdService,
+  getShirtsProductByIdService,
+} from "../../api/userServices/userDashboard";
+import DetailSkeleton from "../loading/detailSkeletion";
 
 const ProductDetails = () => {
-  const { id } = useParams();
+  const { category, id } = useParams();
   const location = useLocation();
   const [product, setProduct] = useState(location.state?.product || null);
-  console.log("Product from location state:", product);
   const [loading, setLoading] = useState(!product);
   const [selectedImg, setSelectedImg] = useState("");
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectedTab, setSelectedTab] = useState("details");
 
+  const serviceMap = {
+    pants: getPantsProductByIdService,
+    shirts: getShirtsProductByIdService,
+    footwear: getFootwearProductByIdService,
+    accessories: getAccessoriesProductByIdService,
+  };
+
   useEffect(() => {
-    if (!product && id) {
+    if (!product && id && category && serviceMap[category]) {
       const fetchProduct = async () => {
         try {
-          const response = await getPantsProductByIdService(id);
+          const response = await serviceMap[category](id);
           if (response?.success) {
             setProduct(response.data);
             setSelectedImg(
               response.data.colors?.[0]?.images?.[0]?.imageUrl || "",
             );
+          } else {
+            console.error("Product not found");
           }
         } catch (error) {
           console.error("Failed to fetch product", error);
@@ -37,8 +51,10 @@ const ProductDetails = () => {
     } else if (product) {
       setSelectedImg(product.colors?.[0]?.images?.[0]?.imageUrl || "");
       setLoading(false);
+    } else {
+      setLoading(false);
     }
-  }, [product, id]);
+  }, [product, id, category]);
 
   useEffect(() => {
     if (product && product.colors?.[selectedColorIndex]) {
@@ -48,7 +64,7 @@ const ProductDetails = () => {
     }
   }, [selectedColorIndex, product]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <DetailSkeleton />;
   if (!product) return <div>Product not found</div>;
 
   return (
@@ -63,7 +79,7 @@ const ProductDetails = () => {
           />
           <div className="product-details-thumbnail-row">
             {product.colors?.[selectedColorIndex]?.images
-              ?.slice(1)
+              // ?.slice(1)
               ?.map((img, index) => (
                 <img
                   key={index}
@@ -116,22 +132,27 @@ const ProductDetails = () => {
             </>
           )}
 
-          <p className="product-details-label">Size</p>
-          <div className="product-details-size-buttons">
-            {product.colors?.[selectedColorIndex]?.sizes
-              ?.filter((sizeObj) => sizeObj.qty > 0)
-              .map((sizeObj) => (
-                <button
-                  key={sizeObj.size}
-                  className={`product-details-size-btn ${
-                    selectedSize === sizeObj.size ? "selected" : ""
-                  }`}
-                  onClick={() => setSelectedSize(sizeObj.size)}
-                >
-                  {sizeObj.size}
-                </button>
-              ))}
-          </div>
+          {/* Show size section only if sizes exist */}
+          {product.colors?.[selectedColorIndex]?.sizes?.length > 0 && (
+            <>
+              <p className="product-details-label">Size</p>
+              <div className="product-details-size-buttons">
+                {product.colors[selectedColorIndex].sizes
+                  .filter((sizeObj) => sizeObj.qty > 0)
+                  .map((sizeObj) => (
+                    <button
+                      key={sizeObj.size}
+                      className={`product-details-size-btn ${
+                        selectedSize === sizeObj.size ? "selected" : ""
+                      }`}
+                      onClick={() => setSelectedSize(sizeObj.size)}
+                    >
+                      {sizeObj.size}
+                    </button>
+                  ))}
+              </div>
+            </>
+          )}
 
           <div className="product-details-actions">
             <button className="product-details-add-to-cart">Add to cart</button>
@@ -165,7 +186,7 @@ const ProductDetails = () => {
         <div className="product-tab-content">
           {selectedTab === "details" ? (
             <div className="product-details-content">
-              <p>
+              {/* <p>
                 <strong>Material:</strong> {product.material || "100% Cotton"}
               </p>
               <p>
@@ -173,7 +194,7 @@ const ProductDetails = () => {
               </p>
               <p>
                 <strong>Care:</strong> {product.care || "Machine wash cold"}
-              </p>
+              </p> */}
               <p>
                 <strong>Description:</strong>{" "}
                 {product.description || "No description available."}

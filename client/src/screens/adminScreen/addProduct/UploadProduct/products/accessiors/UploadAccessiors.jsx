@@ -20,7 +20,7 @@ const UploadAccessories = () => {
   const [discountPrice, setDiscountPrice] = useState("");
 
   const [accessoryType, setAccessoryType] = useState("chain");
-
+  const [qty, setQty] = useState("");
   const [colors, setColors] = useState([]);
   const [imagesByColor, setImagesByColor] = useState({});
   const [colorInput, setColorInput] = useState("");
@@ -49,14 +49,21 @@ const UploadAccessories = () => {
       presentToast.error("Please enter a color name");
       return;
     }
+    if (!qty) {
+      presentToast.error("Please enter quantity");
+      return;
+    }
+
     const newColor = {
       name: colorInput.trim(),
       hex: colorHex,
+      qty: Number(qty) || 0,
     };
     setColors([newColor]);
     setImagesByColor({ [newColor.name]: [] });
     setColorInput("");
     setColorHex("#000000");
+    setQty("");
   };
 
   const handleImageChange = (e, colorName) => {
@@ -125,6 +132,7 @@ const UploadAccessories = () => {
         {
           name: selectedColor.name,
           hex: selectedColor.hex,
+          qty: selectedColor.qty,
         },
       ];
 
@@ -334,6 +342,14 @@ const UploadAccessories = () => {
               className="my-color-input"
             />
             <input
+              type="number"
+              placeholder="Qty"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+              className="my-color-input"
+              style={{ width: 100 }}
+            />
+            <input
               type="color"
               value={colorHex}
               onChange={(e) => setColorHex(e.target.value)}
@@ -371,7 +387,10 @@ const UploadAccessories = () => {
                   Delete
                 </button>
               </div>
-
+              <div className="my-color-title">
+                <h4>{color.name}</h4>
+                <p>Qty: {color.qty}</p>
+              </div>
               <div className="my-image-list">
                 {imagesByColor[color.name]?.map((img, index) => (
                   <div key={index} className="my-image-box">

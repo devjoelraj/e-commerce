@@ -32,8 +32,8 @@ const Header = () => {
   ];
 
   const dropdownSections = {
-    footwears: ["shoe", "silppers"],
-    Accessories: ["Watch", "Chains", "Rings"],
+    footwears: ["shoe", "slipper"],
+    Accessories: ["watch", "chain", "ring"],
   };
 
   const handleNavigation = (item) => {
@@ -42,9 +42,17 @@ const Header = () => {
 
     if (item.includes(" - ")) {
       const [section, category] = item.split(" - ");
+
+      const mainCategory =
+        section.toLowerCase() === "footwears" ? "Footwear" : section;
+
       navigate("/ProductLists", {
-        state: { data: section, category },
+        state: {
+          category: mainCategory,
+          type: category.toLowerCase(),
+        },
       });
+
       return;
     }
 
@@ -67,7 +75,7 @@ const Header = () => {
 
       default:
         navigate("/ProductLists", {
-          state: { data: item },
+          state: { category: item },
         });
     }
   };

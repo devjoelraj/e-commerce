@@ -82,7 +82,6 @@ export const createShirtsProductService = async ({
   return shirtsProduct;
 };
 
-// Get all shirts products with optional filters
 export const getShirtsProductsService = async (filters = {}) => {
   return await shirtsModel
     .find(filters)
@@ -90,7 +89,9 @@ export const getShirtsProductsService = async (filters = {}) => {
     .sort({ createdAt: -1 });
 };
 
-// Update a shirts product
+export const getShirtsProductByIdService = async (id) => {
+  return await Shirts.findById(id).populate("createdBy", "email");
+};
 export const updateShirtsProductService = async (id, updateData) => {
   const product = await shirtsModel.findById(id);
   if (!product) throw new Error("Shirts product not found");

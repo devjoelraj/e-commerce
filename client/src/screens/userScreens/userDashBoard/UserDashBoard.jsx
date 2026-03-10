@@ -7,9 +7,7 @@ import { FaTshirt } from "react-icons/fa";
 import {
   GiArmoredPants,
   GiConverseShoe,
-  GiDress,
   GiFlipFlops,
-  GiHighHeel,
   GiWatch,
 } from "react-icons/gi";
 import HomeCarousel from "./Carousel/Carousel";

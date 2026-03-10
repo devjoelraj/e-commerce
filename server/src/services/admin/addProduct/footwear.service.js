@@ -90,6 +90,9 @@ export const getShoesProductsService = async (filters = {}) => {
     .populate("createdBy", "email")
     .sort({ createdAt: -1 });
 };
+export const getFootwearProductByIdService = async (id) => {
+  return await footWear.findById(id).populate("createdBy", "email");
+};
 
 export const updateShoesProductService = async (id, updateData) => {
   const product = await footWear.findById(id);

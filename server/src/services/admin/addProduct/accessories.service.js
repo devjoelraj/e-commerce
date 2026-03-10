@@ -50,6 +50,7 @@ export const createAccessoriesProductService = async ({
   const colorsWithImages = colors.map((color) => ({
     name: color.name,
     hex: color.hex,
+    qty: Number(color.qty) || 0,
     images: colorImageMap[color.name] || [],
   }));
 
@@ -189,10 +190,14 @@ export const addColorVariantService = async (
     product.colors.push({
       name: color.name,
       hex: color.hex,
+      qty: Number(color.qty) || 0,
       images: colorImageMap[color.name] || [],
     });
   });
 
   await product.save();
   return product;
+};
+export const getAccessoriesProductByIdService = async (id) => {
+  return await Accessories.findById(id).populate("createdBy", "email");
 };
