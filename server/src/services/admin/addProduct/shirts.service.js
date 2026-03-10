@@ -1,8 +1,4 @@
 import shirtsModel from "../../../models/admin/addProduct/shirts.model.js";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../../../utils/cloudinary.util.js";
 
 export const createShirtsProductService = async ({
   productName,
@@ -138,47 +134,6 @@ export const updateShirtsProductService = async (id, updateData) => {
     .populate("createdBy", "email");
 
   return updatedProduct;
-};
-
-export const deleteShirtsProductService = async (id) => {
-  const product = await shirtsModel.findById(id);
-  if (!product) throw new Error("Shirts product not found");
-
-  const deletePromises = [];
-  product.colors.forEach((color) => {
-    color.images.forEach((image) => {
-      deletePromises.push(deleteFromCloudinary(image.publicId));
-    });
-  });
-
-  await Promise.all(deletePromises);
-
-  await shirtsModel.findByIdAndDelete(id);
-
-  return true;
-};
-
-// Delete a specific image from a color variant
-export const deleteProductImageService = async (
-  productId,
-  colorName,
-  imageIndex,
-) => {
-  const product = await shirtsModel.findById(productId);
-  if (!product) throw new Error("Shirts product not found");
-
-  const colorIndex = product.colors.findIndex((c) => c.name === colorName);
-  if (colorIndex === -1) throw new Error("Color not found");
-
-  const image = product.colors[colorIndex].images[imageIndex];
-  if (!image) throw new Error("Image not found");
-
-  await deleteFromCloudinary(image.publicId);
-
-  product.colors[colorIndex].images.splice(imageIndex, 1);
-  await product.save();
-
-  return product;
 };
 
 // Add a new color variant to an existing shirts product

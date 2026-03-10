@@ -1,8 +1,4 @@
 import footWear from "../../../models/admin/addProduct/footWear.model.js";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../../../utils/cloudinary.util.js";
 
 export const createShoesProductService = async ({
   productName,
@@ -140,45 +136,6 @@ export const updateShoesProductService = async (id, updateData) => {
     .populate("createdBy", "email");
 
   return updatedProduct;
-};
-
-export const deleteShoesProductService = async (id) => {
-  const product = await footWear.findById(id);
-  if (!product) throw new Error("Shoes product not found");
-
-  const deletePromises = [];
-  product.colors.forEach((color) => {
-    color.images.forEach((image) => {
-      deletePromises.push(deleteFromCloudinary(image.publicId));
-    });
-  });
-
-  await Promise.all(deletePromises);
-  await footWear.findByIdAndDelete(id);
-
-  return true;
-};
-
-export const deleteProductImageService = async (
-  productId,
-  colorName,
-  imageIndex,
-) => {
-  const product = await footWear.findById(productId);
-  if (!product) throw new Error("Shoes product not found");
-
-  const colorIndex = product.colors.findIndex((c) => c.name === colorName);
-  if (colorIndex === -1) throw new Error("Color not found");
-
-  const image = product.colors[colorIndex].images[imageIndex];
-  if (!image) throw new Error("Image not found");
-
-  await deleteFromCloudinary(image.publicId);
-
-  product.colors[colorIndex].images.splice(imageIndex, 1);
-  await product.save();
-
-  return product;
 };
 
 export const addColorVariantService = async (

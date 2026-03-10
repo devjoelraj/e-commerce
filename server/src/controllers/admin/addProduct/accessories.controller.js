@@ -2,8 +2,6 @@ import {
   createAccessoriesProductService,
   getAccessoriesProductsService,
   updateAccessoriesProductService,
-  deleteAccessoriesProductService,
-  deleteProductImageService,
   addColorVariantService,
 } from "../../../services/admin/addProduct/accessories.service.js";
 
@@ -119,51 +117,6 @@ export const updateAccessoriesProduct = async (req, res) => {
       message: "Accessories product updated successfully",
       data: updatedProduct,
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// ---------- DELETE PRODUCT OR IMAGE ----------
-export const deleteProduct = async (req, res) => {
-  try {
-    const { productId, colorName, imageIndex } = req.body;
-
-    if (imageIndex !== undefined) {
-      // Delete a single image from a color variant
-      if (!productId || !colorName) {
-        return res.status(400).json({
-          message: "productId and colorName are required for image deletion",
-        });
-      }
-
-      const updatedProduct = await deleteProductImageService(
-        productId,
-        colorName,
-        imageIndex,
-      );
-
-      return res.json({
-        success: true,
-        message: "Image deleted successfully",
-        data: updatedProduct,
-      });
-    } else {
-      // Delete the entire product
-      const idToDelete = productId || req.params.id;
-      if (!idToDelete) {
-        return res.status(400).json({
-          message: "productId or id parameter is required for product deletion",
-        });
-      }
-
-      await deleteAccessoriesProductService(idToDelete);
-
-      return res.json({
-        success: true,
-        message: "Accessories product deleted successfully",
-      });
-    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

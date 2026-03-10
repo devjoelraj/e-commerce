@@ -14,7 +14,6 @@ import {
   getPantsProducts,
   updatePantsProduct,
   addColorVariantController as addPantsColorVariant,
-  deleteProduct as deletePantsProduct,
 } from "../controllers/admin/addProduct/pants.controller.js";
 
 // Shirts controllers
@@ -23,7 +22,6 @@ import {
   getShirtsProducts,
   updateShirtsProduct,
   addColorVariantController as addShirtsColorVariant,
-  deleteProduct as deleteShirtsProduct,
   getShirtsProductById,
 } from "../controllers/admin/addProduct/shirts.controller.js";
 
@@ -33,7 +31,6 @@ import {
   getShoesProducts,
   updateShoesProduct,
   addColorVariantController as addShoesColorVariant,
-  deleteProduct as deleteShoesProduct,
   getFootwearProductById,
 } from "../controllers/admin/addProduct/footWear.controller.js";
 import {
@@ -42,8 +39,11 @@ import {
   getAccessoriesProducts,
   updateAccessoriesProduct,
   addColorVariantController as addAccessoriesColorVariant,
-  deleteProduct as deleteAccessoriesProduct,
 } from "../controllers/admin/addProduct/accessories.controller.js";
+import {
+  deleteProduct,
+  getAllProducts,
+} from "../controllers/admin/getAllProduct.controller.js";
 
 const router = express.Router();
 
@@ -65,7 +65,6 @@ router.post(
   upload.array("file"),
   addPantsColorVariant,
 );
-router.post("/pants/delete", deletePantsProduct);
 
 // ========== Shirts Routes ==========
 router.post(
@@ -82,7 +81,6 @@ router.post(
   upload.array("file"),
   addShirtsColorVariant,
 );
-router.post("/shirts/delete", deleteShirtsProduct);
 
 // ========== footwear Routes ==========
 
@@ -100,7 +98,6 @@ router.post(
   upload.array("file"),
   addShoesColorVariant,
 );
-router.post("/shoes/delete", deleteShoesProduct);
 
 // ========== Accessories Routes ==========
 router.post(
@@ -116,6 +113,9 @@ router.post(
   upload.array("file"),
   addAccessoriesColorVariant,
 );
-router.post("/accessories/delete", deleteAccessoriesProduct);
+
+// ========== all product Routes ==========
+router.post("/deleteProduct", deleteProduct);
+router.get("/allProducts", getAllProducts);
 
 export default router;

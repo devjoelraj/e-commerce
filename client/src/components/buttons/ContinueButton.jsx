@@ -1,4 +1,3 @@
-// components/ContinueButton.js
 import React from "react";
 import "./ContinueButton.css";
 

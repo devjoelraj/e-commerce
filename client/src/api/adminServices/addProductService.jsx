@@ -106,6 +106,7 @@ export const addExistingShirtsVariantService = async (id, bodyContent) => {
     return { success: false, message: error.message };
   }
 };
+
 // ========== Footwear Services ==========
 
 export const postFootwearProductService = async (bodyContent) => {
@@ -130,20 +131,6 @@ export const addExistingFootwearVariantService = async (id, bodyContent) => {
       return response?.data;
     }
     return { success: false, message: "Failed to add color variant" };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-export const deleteFootwearProductService = async (payload) => {
-  try {
-    const response = await apiClient.post("/admin/shoes/delete", payload);
-    if (response?.status === 200) {
-      return response?.data;
-    }
-    return {
-      success: false,
-      message: "Failed to delete footwear product/image",
-    };
   } catch (error) {
     return { success: false, message: error.message };
   }
@@ -176,21 +163,6 @@ export const addExistingAccessoriesVariantService = async (id, bodyContent) => {
       return response?.data;
     }
     return { success: false, message: "Failed to add color variant" };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-export const deleteAccessoriesProductService = async (payload) => {
-  try {
-    const response = await apiClient.post("/admin/accessories/delete", payload);
-    if (response?.status === 200) {
-      return response?.data;
-    }
-    return {
-      success: false,
-      message: "Failed to delete accessories product/image",
-    };
   } catch (error) {
     return { success: false, message: error.message };
   }

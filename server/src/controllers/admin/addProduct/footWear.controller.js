@@ -2,8 +2,6 @@ import {
   createShoesProductService,
   getShoesProductsService,
   updateShoesProductService,
-  deleteShoesProductService,
-  deleteProductImageService,
   addColorVariantService,
 } from "../../../services/admin/addProduct/footwear.service.js";
 
@@ -143,48 +141,6 @@ export const updateShoesProduct = async (req, res) => {
       message: "Shoes product updated successfully",
       data: updatedProduct,
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const deleteProduct = async (req, res) => {
-  try {
-    const { productId, colorName, imageIndex } = req.body;
-
-    if (imageIndex !== undefined) {
-      if (!productId || !colorName) {
-        return res.status(400).json({
-          message: "productId and colorName are required for image deletion",
-        });
-      }
-
-      const updatedProduct = await deleteProductImageService(
-        productId,
-        colorName,
-        imageIndex,
-      );
-
-      return res.json({
-        success: true,
-        message: "Image deleted successfully",
-        data: updatedProduct,
-      });
-    } else {
-      const idToDelete = productId || req.params.id;
-      if (!idToDelete) {
-        return res.status(400).json({
-          message: "productId or id parameter is required for product deletion",
-        });
-      }
-
-      await deleteShoesProductService(idToDelete);
-
-      return res.json({
-        success: true,
-        message: "Shoes product deleted successfully",
-      });
-    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

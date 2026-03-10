@@ -38,7 +38,7 @@ const HomeCarousel = () => {
   }, []);
 
   if (loading) {
-    return <Spin />;
+    return <div className="skeleton skeleton-carousel"></div>;
   }
 
   if (sliders.length === 0) {

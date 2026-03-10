@@ -1,8 +1,4 @@
 import Accessories from "../../../models/admin/addProduct/accessories.model.js";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../../../utils/cloudinary.util.js";
 
 // ---------- CREATE PRODUCT ----------
 export const createAccessoriesProductService = async ({
@@ -99,47 +95,6 @@ export const updateAccessoriesProductService = async (id, updateData) => {
   }).populate("createdBy", "email");
 
   return updatedProduct;
-};
-
-// ---------- DELETE PRODUCT ----------
-export const deleteAccessoriesProductService = async (id) => {
-  const product = await Accessories.findById(id);
-  if (!product) throw new Error("Accessories product not found");
-
-  const deletePromises = [];
-  product.colors.forEach((color) => {
-    color.images.forEach((image) => {
-      deletePromises.push(deleteFromCloudinary(image.publicId));
-    });
-  });
-
-  await Promise.all(deletePromises);
-  await Accessories.findByIdAndDelete(id);
-
-  return true;
-};
-
-// ---------- DELETE SINGLE IMAGE FROM COLOR VARIANT ----------
-export const deleteProductImageService = async (
-  productId,
-  colorName,
-  imageIndex,
-) => {
-  const product = await Accessories.findById(productId);
-  if (!product) throw new Error("Accessories product not found");
-
-  const colorIndex = product.colors.findIndex((c) => c.name === colorName);
-  if (colorIndex === -1) throw new Error("Color not found");
-
-  const image = product.colors[colorIndex].images[imageIndex];
-  if (!image) throw new Error("Image not found");
-
-  await deleteFromCloudinary(image.publicId);
-
-  product.colors[colorIndex].images.splice(imageIndex, 1);
-  await product.save();
-
-  return product;
 };
 
 // ---------- ADD NEW COLOR VARIANT ----------
