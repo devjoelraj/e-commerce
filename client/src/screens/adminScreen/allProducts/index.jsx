@@ -3,10 +3,12 @@ import "./AllProducts.css";
 import {
   getAllProductService,
   deleteProductService,
+  updateProductService,
 } from "../../../api/adminServices/allProductService";
 import ContinueButton from "../../../components/buttons/ContinueButton";
 import presentToast from "../../../components/Toast/Toast";
 import ConfirmModal from "../../../components/popUp/ConfirmModal";
+import EditProductModal from "./EditProductModal";
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
@@ -14,6 +16,8 @@ const AllProducts = () => {
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     fetchAllProducts();
@@ -23,6 +27,7 @@ const AllProducts = () => {
     try {
       setIsLoading(true);
       const response = await getAllProductService();
+      console.log(response, "res");
       if (response?.success) {
         setProducts(response?.data || []);
       } else {
@@ -36,6 +41,28 @@ const AllProducts = () => {
     }
   };
 
+  const handleUpdateProduct = async (data) => {
+    try {
+      setEditLoading(true);
+
+      const response = await updateProductService(data);
+
+      if (response?.success) {
+        presentToast.success("Product updated");
+
+        await fetchAllProducts();
+
+        setShowEditModal(false);
+        setSelectedProduct(null);
+      } else {
+        presentToast.error(response?.message);
+      }
+    } catch (error) {
+      presentToast.error("Update failed");
+    } finally {
+      setEditLoading(false);
+    }
+  };
   const handleDelete = async () => {
     if (!selectedProduct) return;
 
@@ -95,7 +122,15 @@ const AllProducts = () => {
               <td className="product-name">{item.productName}</td>
               <td>{item.totalQuantity}</td>
               <td className="actions">
-                <button className="edit-btn">Edit</button>
+                <button
+                  className="edit-btn"
+                  onClick={() => {
+                    setSelectedProduct(item);
+                    setShowEditModal(true);
+                  }}
+                >
+                  Edit
+                </button>{" "}
                 <ContinueButton
                   text="Delete"
                   loading={deleteLoadingId === item._id}
@@ -131,6 +166,16 @@ const AllProducts = () => {
           setSelectedProduct(null);
         }}
         onConfirm={handleDelete}
+      />
+      <EditProductModal
+        open={showEditModal}
+        product={selectedProduct}
+        loading={editLoading}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedProduct(null);
+        }}
+        onSave={handleUpdateProduct}
       />
     </div>
   );

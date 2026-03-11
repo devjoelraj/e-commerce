@@ -1,6 +1,5 @@
 import {
   getPantsProductsService,
-  updatePantsProductService,
   createPantsProductService,
   addColorVariantService,
 } from "../../../services/admin/addProduct/pants.service.js";
@@ -99,45 +98,6 @@ export const getPantsProducts = async (req, res) => {
       success: true,
       count: products.length,
       data: products,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const updatePantsProduct = async (req, res) => {
-  try {
-    let { sizes, colors, totalQuantity } = req.body;
-
-    if (typeof sizes === "string") {
-      try {
-        sizes = JSON.parse(sizes);
-      } catch (e) {
-        return res.status(400).json({ message: "Invalid sizes format" });
-      }
-    }
-    if (typeof colors === "string") {
-      try {
-        colors = JSON.parse(colors);
-      } catch (e) {
-        return res.status(400).json({ message: "Invalid colors format" });
-      }
-    }
-
-    const updateData = { ...req.body, sizes, colors };
-
-    if (totalQuantity !== undefined) {
-      updateData.totalQuantity = Number(totalQuantity);
-    }
-
-    const updatedProduct = await updatePantsProductService(
-      req.params.id,
-      updateData,
-    );
-    res.json({
-      success: true,
-      message: "Pants product updated successfully",
-      data: updatedProduct,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

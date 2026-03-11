@@ -1,7 +1,6 @@
 import {
   createAccessoriesProductService,
   getAccessoriesProductsService,
-  updateAccessoriesProductService,
   addColorVariantService,
 } from "../../../services/admin/addProduct/accessories.service.js";
 
@@ -96,26 +95,6 @@ export const getAccessoriesProducts = async (req, res) => {
       success: true,
       count: products.length,
       data: products,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// ---------- UPDATE PRODUCT ----------
-export const updateAccessoriesProduct = async (req, res) => {
-  try {
-    // No sizes or totalQuantity handling
-    const updateData = { ...req.body };
-
-    const updatedProduct = await updateAccessoriesProductService(
-      req.params.id,
-      updateData,
-    );
-    res.json({
-      success: true,
-      message: "Accessories product updated successfully",
-      data: updatedProduct,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

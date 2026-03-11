@@ -104,3 +104,38 @@ export const deleteProductImageService = async (
 
   return product;
 };
+
+export const updateProductService = async (body) => {
+  const { _id, category, pricing, colors } = body;
+
+  const modelMap = {
+    shirts: Shirts,
+    pants: Pants,
+    footwear: footWearModel,
+    accessories: Accessories,
+  };
+
+  const Model = modelMap[category];
+
+  if (!Model) throw new Error("Invalid category");
+
+  const product = await Model.findById(_id);
+
+  if (!product) throw new Error("Product not found");
+
+  product.pricing = pricing;
+  product.colors = colors;
+
+  if (category === "accessories") {
+    product.totalQuantity = colors.reduce((sum, c) => sum + (c.qty || 0), 0);
+  } else {
+    product.totalQuantity = colors.reduce(
+      (sum, c) => sum + c.sizes.reduce((s, size) => s + (size.qty || 0), 0),
+      0,
+    );
+  }
+
+  await product.save();
+
+  return product;
+};

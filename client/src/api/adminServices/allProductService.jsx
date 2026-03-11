@@ -23,3 +23,17 @@ export const deleteProductService = async (bodyContent) => {
     return { success: false, message: error.message };
   }
 };
+
+export const updateProductService = async (data) => {
+  try {
+    const response = await apiClient.post("/admin/updateProduct", data);
+
+    if (response?.status === 200) {
+      return response.data;
+    }
+
+    return { success: false, message: "Update failed" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};

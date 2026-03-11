@@ -2,6 +2,7 @@ import {
   deleteProductImageService,
   deleteProductService,
   getAllProductsService,
+  updateProductService,
 } from "../../services/admin/getAllProduct.service.js";
 
 export const getAllProducts = async (req, res) => {
@@ -61,6 +62,23 @@ export const deleteProduct = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Product deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    const result = await updateProductService(req.body);
+
+    res.json({
+      success: true,
+      data: result,
+      message: "Product updated successfully",
     });
   } catch (error) {
     res.status(500).json({

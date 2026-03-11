@@ -90,54 +90,6 @@ export const getFootwearProductByIdService = async (id) => {
   return await footWear.findById(id).populate("createdBy", "email");
 };
 
-export const updateShoesProductService = async (id, updateData) => {
-  const product = await footWear.findById(id);
-  if (!product) throw new Error("Shoes product not found");
-
-  if (updateData.sizes && typeof updateData.sizes === "string") {
-    try {
-      updateData.sizes = JSON.parse(updateData.sizes);
-    } catch (e) {
-      throw new Error("Invalid sizes data");
-    }
-  }
-
-  if (updateData.pricing) {
-    updateData.pricing = {
-      basePrice: updateData.pricing.basePrice || product.pricing.basePrice,
-      discountPercentage:
-        updateData.pricing.discountPercentage ||
-        product.pricing.discountPercentage,
-      discountPrice:
-        updateData.pricing.discountPrice || product.pricing.discountPrice,
-    };
-  }
-
-  if (updateData.sizes) {
-    const totalQuantity = Object.values(updateData.sizes).reduce(
-      (sum, qty) => sum + qty,
-      0,
-    );
-    updateData.totalQuantity = totalQuantity;
-    updateData.sizes = new Map(Object.entries(updateData.sizes));
-  }
-
-  if (
-    updateData.totalQuantity !== undefined &&
-    updateData.sizes === undefined
-  ) {
-    updateData.totalQuantity = Number(updateData.totalQuantity);
-  }
-
-  const updatedProduct = await footWear
-    .findByIdAndUpdate(id, updateData, {
-      new: true,
-    })
-    .populate("createdBy", "email");
-
-  return updatedProduct;
-};
-
 export const addColorVariantService = async (
   productId,
   colorsString,

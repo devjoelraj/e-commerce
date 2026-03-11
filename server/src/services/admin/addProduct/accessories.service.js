@@ -73,30 +73,6 @@ export const getAccessoriesProductsService = async (filters = {}) => {
     .sort({ createdAt: -1 });
 };
 
-// ---------- UPDATE PRODUCT ----------
-export const updateAccessoriesProductService = async (id, updateData) => {
-  const product = await Accessories.findById(id);
-  if (!product) throw new Error("Accessories product not found");
-
-  // Handle pricing if present
-  if (updateData.pricing) {
-    updateData.pricing = {
-      basePrice: updateData.pricing.basePrice || product.pricing.basePrice,
-      discountPercentage:
-        updateData.pricing.discountPercentage ||
-        product.pricing.discountPercentage,
-      discountPrice:
-        updateData.pricing.discountPrice || product.pricing.discountPrice,
-    };
-  }
-
-  const updatedProduct = await Accessories.findByIdAndUpdate(id, updateData, {
-    new: true,
-  }).populate("createdBy", "email");
-
-  return updatedProduct;
-};
-
 // ---------- ADD NEW COLOR VARIANT ----------
 export const addColorVariantService = async (
   productId,

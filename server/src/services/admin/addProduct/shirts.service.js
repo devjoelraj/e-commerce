@@ -88,53 +88,6 @@ export const getShirtsProductsService = async (filters = {}) => {
 export const getShirtsProductByIdService = async (id) => {
   return await Shirts.findById(id).populate("createdBy", "email");
 };
-export const updateShirtsProductService = async (id, updateData) => {
-  const product = await shirtsModel.findById(id);
-  if (!product) throw new Error("Shirts product not found");
-
-  if (updateData.sizes && typeof updateData.sizes === "string") {
-    try {
-      updateData.sizes = JSON.parse(updateData.sizes);
-    } catch (e) {
-      throw new Error("Invalid sizes data");
-    }
-  }
-
-  if (updateData.pricing) {
-    updateData.pricing = {
-      basePrice: updateData.pricing.basePrice || product.pricing.basePrice,
-      discountPercentage:
-        updateData.pricing.discountPercentage ||
-        product.pricing.discountPercentage,
-      discountPrice:
-        updateData.pricing.discountPrice || product.pricing.discountPrice,
-    };
-  }
-
-  if (updateData.sizes) {
-    const totalQuantity = Object.values(updateData.sizes).reduce(
-      (sum, qty) => sum + qty,
-      0,
-    );
-    updateData.totalQuantity = totalQuantity;
-    updateData.sizes = new Map(Object.entries(updateData.sizes));
-  }
-
-  if (
-    updateData.totalQuantity !== undefined &&
-    updateData.sizes === undefined
-  ) {
-    updateData.totalQuantity = Number(updateData.totalQuantity);
-  }
-
-  const updatedProduct = await shirtsModel
-    .findByIdAndUpdate(id, updateData, {
-      new: true,
-    })
-    .populate("createdBy", "email");
-
-  return updatedProduct;
-};
 
 // Add a new color variant to an existing shirts product
 export const addColorVariantService = async (
