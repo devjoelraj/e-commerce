@@ -39,6 +39,7 @@ const footWearSchema = new mongoose.Schema(
 
     totalQuantity: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
+    offerProduct: { type: Boolean, default: false },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true },

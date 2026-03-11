@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import ContinueButton from ".././../../components/buttons/ContinueButton";
 import "./EditProductModal.css";
+
 const EditProductModal = ({ open, product, onClose, onSave, loading }) => {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
     if (product) {
-      setFormData(JSON.parse(JSON.stringify(product)));
+      const cloned = JSON.parse(JSON.stringify(product));
+      if (cloned.offerProduct === undefined) cloned.offerProduct = false;
+      setFormData(cloned);
     }
   }, [product]);
 
@@ -16,7 +19,6 @@ const EditProductModal = ({ open, product, onClose, onSave, loading }) => {
     if (formData.category === "accessories") {
       return colors.reduce((sum, c) => sum + (c.qty || 0), 0);
     }
-
     return colors.reduce(
       (sum, color) =>
         sum + color.sizes.reduce((s, size) => s + (size.qty || 0), 0),
@@ -26,21 +28,15 @@ const EditProductModal = ({ open, product, onClose, onSave, loading }) => {
 
   const updateQty = (colorIndex, sizeIndex, value) => {
     const updated = { ...formData };
-
     updated.colors[colorIndex].sizes[sizeIndex].qty = Number(value);
-
     updated.totalQuantity = calculateTotalQty(updated.colors);
-
     setFormData(updated);
   };
 
   const updateAccessoryQty = (colorIndex, value) => {
     const updated = { ...formData };
-
     updated.colors[colorIndex].qty = Number(value);
-
     updated.totalQuantity = calculateTotalQty(updated.colors);
-
     setFormData(updated);
   };
 
@@ -58,6 +54,29 @@ const EditProductModal = ({ open, product, onClose, onSave, loading }) => {
     <div className="modal-overlay">
       <div className="edit-modal">
         <h3>Edit {formData.productName}</h3>
+
+        <div className="offer-radio" style={{ marginBottom: "20px" }}>
+          <label style={{ marginRight: "20px" }}>
+            <input
+              type="radio"
+              name="offerProduct"
+              value="yes"
+              checked={formData.offerProduct === true}
+              onChange={() => setFormData({ ...formData, offerProduct: true })}
+            />{" "}
+            Yes
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="offerProduct"
+              value="no"
+              checked={formData.offerProduct === false}
+              onChange={() => setFormData({ ...formData, offerProduct: false })}
+            />{" "}
+            No
+          </label>
+        </div>
 
         {/* PRICE */}
         <div className="price-section">
@@ -98,7 +117,6 @@ const EditProductModal = ({ open, product, onClose, onSave, loading }) => {
               color.sizes.map((size, sizeIndex) => (
                 <div key={size._id} className="size-row">
                   <span>{size.size}</span>
-
                   <input
                     type="number"
                     value={size.qty}

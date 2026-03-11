@@ -74,7 +74,6 @@ export const deleteProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const result = await updateProductService(req.body);
-
     res.json({
       success: true,
       data: result,

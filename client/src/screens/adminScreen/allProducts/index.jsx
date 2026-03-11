@@ -27,7 +27,6 @@ const AllProducts = () => {
     try {
       setIsLoading(true);
       const response = await getAllProductService();
-      console.log(response, "res");
       if (response?.success) {
         setProducts(response?.data || []);
       } else {
@@ -44,14 +43,10 @@ const AllProducts = () => {
   const handleUpdateProduct = async (data) => {
     try {
       setEditLoading(true);
-
       const response = await updateProductService(data);
-
       if (response?.success) {
         presentToast.success("Product updated");
-
         await fetchAllProducts();
-
         setShowEditModal(false);
         setSelectedProduct(null);
       } else {
@@ -63,24 +58,16 @@ const AllProducts = () => {
       setEditLoading(false);
     }
   };
+
   const handleDelete = async () => {
     if (!selectedProduct) return;
-
     const { _id: productId, category } = selectedProduct;
-
     try {
       setDeleteLoadingId(productId);
-
-      const response = await deleteProductService({
-        productId,
-        category,
-      });
-      console.log(response, "re");
+      const response = await deleteProductService({ productId, category });
       if (response?.success) {
         presentToast.success("Product deleted successfully");
-
         await fetchAllProducts();
-
         setShowDeleteModal(false);
         setSelectedProduct(null);
       } else {
@@ -167,6 +154,7 @@ const AllProducts = () => {
         }}
         onConfirm={handleDelete}
       />
+
       <EditProductModal
         open={showEditModal}
         product={selectedProduct}

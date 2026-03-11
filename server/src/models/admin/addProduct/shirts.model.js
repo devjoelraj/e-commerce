@@ -77,7 +77,7 @@ const shirtsSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-
+    offerProduct: { type: Boolean, default: false },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

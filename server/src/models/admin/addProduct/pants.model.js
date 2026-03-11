@@ -82,7 +82,9 @@ const pantsSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    offerProduct: { type: Boolean, default: false },
   },
+
   { timestamps: true },
 );
 
