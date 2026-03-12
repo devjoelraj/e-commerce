@@ -4,6 +4,7 @@ import ProductCards from "../productCards/ProductCards";
 import Header from "../header/userHeader/Header";
 import {
   getAccessoriesProductsService,
+  getAllproductsService,
   getFootwearProductsService,
   getPantsProductsService,
   getShirtsProductsService,
@@ -34,6 +35,8 @@ const ProductLists = () => {
         } else if (category === "Deals") {
           response = await getoffersService();
           console.log(response);
+        } else if (category === "All") {
+          response = await getAllproductsService();
         } else if (
           category === "Shoes" ||
           category === "Slippers" ||

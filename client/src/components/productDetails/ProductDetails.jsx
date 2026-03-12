@@ -14,12 +14,16 @@ import DetailSkeleton from "../loading/detailSkeletion";
 const ProductDetails = () => {
   const { category, id } = useParams();
   const location = useLocation();
+
   const [product, setProduct] = useState(location.state?.product || null);
   const [loading, setLoading] = useState(!product);
+
   const [selectedImg, setSelectedImg] = useState("");
-  const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(null);
   const [selectedTab, setSelectedTab] = useState("details");
+
+  const [imageLoading, setImageLoading] = useState(true);
 
   const serviceMap = {
     pants: getPantsProductByIdService,
@@ -28,18 +32,20 @@ const ProductDetails = () => {
     accessories: getAccessoriesProductByIdService,
   };
 
+  /* Fetch Product */
   useEffect(() => {
     if (!product && id && category && serviceMap[category]) {
       const fetchProduct = async () => {
         try {
           const response = await serviceMap[category](id);
+
           if (response?.success) {
             setProduct(response.data);
-            setSelectedImg(
-              response.data.colors?.[0]?.images?.[0]?.imageUrl || "",
-            );
-          } else {
-            console.error("Product not found");
+
+            const firstImage =
+              response.data.colors?.[0]?.images?.[0]?.imageUrl || "";
+
+            setSelectedImg(firstImage);
           }
         } catch (error) {
           console.error("Failed to fetch product", error);
@@ -47,20 +53,23 @@ const ProductDetails = () => {
           setLoading(false);
         }
       };
+
       fetchProduct();
     } else if (product) {
-      setSelectedImg(product.colors?.[0]?.images?.[0]?.imageUrl || "");
-      setLoading(false);
-    } else {
+      const firstImage = product.colors?.[0]?.images?.[0]?.imageUrl || "";
+      setSelectedImg(firstImage);
       setLoading(false);
     }
   }, [product, id, category]);
 
+  /* Change image when color changes */
   useEffect(() => {
     if (product && product.colors?.[selectedColorIndex]) {
-      setSelectedImg(
-        product.colors[selectedColorIndex].images?.[0]?.imageUrl || "",
-      );
+      const newImage =
+        product.colors[selectedColorIndex].images?.[0]?.imageUrl || "";
+
+      setImageLoading(true);
+      setSelectedImg(newImage);
     }
   }, [selectedColorIndex, product]);
 
@@ -70,31 +79,48 @@ const ProductDetails = () => {
   return (
     <>
       <Header />
+
       <div className="product-details-container">
+        {/* LEFT SIDE IMAGES */}
         <div className="product-details-images-section">
-          <img
-            src={selectedImg}
-            alt="Main"
-            className="product-details-main-image"
-          />
+          {/* MAIN IMAGE */}
+          <div className="product-details-main-image-wrapper">
+            {imageLoading && (
+              <div className="product-image-loader">
+                <div className="product-image-skeleton"></div>
+              </div>
+            )}
+
+            <img
+              key={selectedImg}
+              src={selectedImg}
+              alt="Main"
+              className={`product-details-main-image ${
+                imageLoading ? "hidden-image" : "show-image"
+              }`}
+              onLoad={() => setImageLoading(false)}
+            />
+          </div>
+
+          {/* THUMBNAILS */}
           <div className="product-details-thumbnail-row">
-            {product.colors?.[selectedColorIndex]?.images
-              // ?.slice(1)
-              ?.map((img, index) => (
-                <img
-                  key={index}
-                  src={img.imageUrl}
-                  alt={`thumb-${index}`}
-                  className="product-details-thumbnail"
-                  onClick={() => {
-                    setSelectedImg(img.imageUrl);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                />
-              ))}
+            {product.colors?.[selectedColorIndex]?.images?.map((img, index) => (
+              <img
+                key={index}
+                src={img.imageUrl}
+                alt="thumbnail"
+                className="product-details-thumbnail"
+                onClick={() => {
+                  setImageLoading(true);
+                  setSelectedImg(img.imageUrl);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
+            ))}
           </div>
         </div>
 
+        {/* RIGHT SIDE DETAILS */}
         <div className="product-details-section">
           <p className="product-details-name">{product.productName}</p>
 
@@ -108,21 +134,24 @@ const ProductDetails = () => {
           </p>
 
           <h1 className="product-details-price">
-            ${product.pricing?.discountPrice || product.pricing?.basePrice}
+            ₹{product.pricing?.discountPrice || product.pricing?.basePrice}
           </h1>
 
-          {product.colors && product.colors.length > 0 && (
+          {/* COLOR OPTIONS */}
+          {product.colors?.length > 0 && (
             <>
               <p className="product-details-label">Color</p>
+
               <div className="product-details-color-options">
                 {product.colors.map((color, index) => (
                   <div
                     key={index}
-                    className={`product-details-color-circle ${selectedColorIndex === index ? "selected" : ""}`}
+                    className={`product-details-color-circle ${
+                      selectedColorIndex === index ? "selected" : ""
+                    }`}
                     style={{ backgroundColor: color.hex }}
                     onClick={() => {
                       setSelectedColorIndex(index);
-                      setSelectedImg(color.images?.[0]?.imageUrl || "");
                       setSelectedSize(null);
                     }}
                     title={color.name}
@@ -132,13 +161,14 @@ const ProductDetails = () => {
             </>
           )}
 
-          {/* Show size section only if sizes exist */}
+          {/* SIZE OPTIONS */}
           {product.colors?.[selectedColorIndex]?.sizes?.length > 0 && (
             <>
               <p className="product-details-label">Size</p>
+
               <div className="product-details-size-buttons">
                 {product.colors[selectedColorIndex].sizes
-                  .filter((sizeObj) => sizeObj.qty > 0)
+                  .filter((size) => size.qty > 0)
                   .map((sizeObj) => (
                     <button
                       key={sizeObj.size}
@@ -154,8 +184,10 @@ const ProductDetails = () => {
             </>
           )}
 
+          {/* ACTION BUTTONS */}
           <div className="product-details-actions">
             <button className="product-details-add-to-cart">Add to cart</button>
+
             <FaHeart className="product-details-wishlist-icon" />
           </div>
 
@@ -163,6 +195,7 @@ const ProductDetails = () => {
         </div>
       </div>
 
+      {/* PRODUCT TABS */}
       <div className="product-tabs-container">
         <div className="product-tabs-header">
           <p
@@ -173,6 +206,7 @@ const ProductDetails = () => {
           >
             Details
           </p>
+
           <p
             className={`product-tab-button ${
               selectedTab === "reviews" ? "active-tab" : ""
@@ -186,15 +220,6 @@ const ProductDetails = () => {
         <div className="product-tab-content">
           {selectedTab === "details" ? (
             <div className="product-details-content">
-              {/* <p>
-                <strong>Material:</strong> {product.material || "100% Cotton"}
-              </p>
-              <p>
-                <strong>Fit:</strong> {product.fit || "Regular Fit"}
-              </p>
-              <p>
-                <strong>Care:</strong> {product.care || "Machine wash cold"}
-              </p> */}
               <p>
                 <strong>Description:</strong>{" "}
                 {product.description || "No description available."}
@@ -202,7 +227,7 @@ const ProductDetails = () => {
             </div>
           ) : (
             <div className="product-reviews-content">
-              <p>No reviews yet. Be the first to leave one!</p>
+              <p>No reviews yet.</p>
             </div>
           )}
         </div>

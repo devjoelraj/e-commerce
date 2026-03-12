@@ -19,12 +19,12 @@ const Header = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState(null);
 
-  const navItems = ["Home", "Deals", "Trends", "Shirts", "Pants"];
+  const navItems = ["Home", "Deals", "All", "Shirts", "Pants"];
 
   const sidebarItems = [
     "Home",
     "Deals",
-    "Trends",
+    "All",
     "Shirts",
     "Pants",
     "Accessories",
@@ -65,9 +65,9 @@ const Header = () => {
         navigate("/productLists", { state: { category: "Deals" } });
         break;
 
-      case "Trends":
+      case "All":
         navigate("/ProductLists", {
-          state: { data: "Trends" },
+          state: { category: "All" },
         });
         break;
 

@@ -83,6 +83,9 @@ const UploadSliderCard = () => {
       if (postResponse?.success) {
         presentToast.success("Images uploaded successfully!");
         setOrderInput("");
+        setFileList([]);
+        setPreviewOpen(false);
+        setPreviewImage("");
       } else {
         presentToast.error(postResponse?.message || "Upload failed");
       }

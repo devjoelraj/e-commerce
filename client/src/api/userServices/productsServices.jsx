@@ -61,3 +61,16 @@ export const getFootwearProductsService = async (type = null) => {
     return { success: false, message: error.message };
   }
 };
+
+export const getAllproductsService = async () => {
+  try {
+    const response = await apiClient.get("/admin/allProducts");
+    if (response?.status === 200) {
+      return response?.data;
+    } else {
+      return { success: false, message: "Failed to fetch products" };
+    }
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};

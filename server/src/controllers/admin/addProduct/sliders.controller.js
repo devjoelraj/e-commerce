@@ -52,10 +52,21 @@ export const getSliders = async (req, res) => {
 
 export const deleteSlider = async (req, res) => {
   try {
+    console.log("DELETE API HIT");
+    console.log("Slider ID:", req.params.id);
+
     await deleteSliderService(req.params.id);
 
-    res.json({ success: true, message: "Slider deleted" });
+    res.json({
+      success: true,
+      message: "Slider deleted",
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("DELETE CONTROLLER ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
