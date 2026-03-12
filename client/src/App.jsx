@@ -17,19 +17,20 @@ import FootWears from "./screens/adminScreen/addProduct/UploadProduct/products/f
 import UploadShirts from "./screens/adminScreen/addProduct/UploadProduct/products/shirts/UploadShirts";
 import UploadProducts from "./screens/adminScreen/addProduct/UploadProduct/products/Products";
 import AllProducts from "./screens/adminScreen/allProducts";
-const Login = lazy(() => import("./screens/authScreens/login/Login"));
-const Otp = lazy(() => import("./screens/authScreens/otp/Otp"));
-const ForgetPassword = lazy(
-  () =>
-    import("./screens/authScreens/passwordScreens/forgetPasswords/ForgetPasswords"),
-);
-const CreatePassword = lazy(
-  () => import("./screens/authScreens/passwordScreens/CreatePassword"),
-);
+import Login from "./screens/authScreens/login";
+// const Login = lazy(() => import("./screens/authScreens/login/Login"));
+// const Otp = lazy(() => import("./screens/authScreens/otp/Otp"));
+// const ForgetPassword = lazy(
+//   () =>
+//     import("./screens/authScreens/passwordScreens/forgetPasswords/ForgetPasswords"),
+// );
+// const CreatePassword = lazy(
+//   () => import("./screens/authScreens/passwordScreens/CreatePassword"),
+// );
 
-const AdminDashboard = lazy(
-  () => import("./screens/adminScreen/adminDashboard/AdminDashboard"),
-);
+// const AdminDashboard = lazy(
+//   () => import("./screens/adminScreen/adminDashboard/AdminDashboard"),
+// );
 const UserDashboard = lazy(
   () => import("./screens/userScreens/userDashBoard/UserDashBoard"),
 );
@@ -45,11 +46,6 @@ function App() {
         }
       >
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/otp" element={<Otp />} />
-          <Route path="/forgot-password" element={<ForgetPassword />} />
-          <Route path="/create-password" element={<CreatePassword />} />
-
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashBoardHome />} />
             <Route path="admin-dashboard" element={<AdminDashBoardHome />} />
@@ -57,7 +53,6 @@ function App() {
             <Route path="DashboardSilders" element={<DashboardSilders />} />
             <Route path="add-offer-product" element={<OfferProducts />} />
             <Route path="sel-upload-products" element={<UploadProducts />} />
-
             <Route path="upload-product-shirts" element={<UploadShirts />} />
             <Route path="upload-product-pants" element={<UploadPants />} />
             <Route
@@ -65,12 +60,12 @@ function App() {
               element={<UploadAccessiors />}
             />
             <Route path="upload-product-footWears" element={<FootWears />} />
-
             <Route path="ordersPage-details" element={<OrdersPage />} />
             <Route path="AllProducts-details" element={<AllProducts />} />
           </Route>
 
-          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/" element={<UserDashboard />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/product/pants/:id" element={<ProductDetails />} />
           <Route path="/product/shirts/:id" element={<ProductDetails />} />
           <Route path="/product/footwear/:id" element={<ProductDetails />} />

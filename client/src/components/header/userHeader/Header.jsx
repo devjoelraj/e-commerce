@@ -58,7 +58,7 @@ const Header = () => {
 
     switch (item) {
       case "Home":
-        navigate("/user-dashboard");
+        navigate("/");
         break;
 
       case "Deals":
@@ -94,7 +94,7 @@ const Header = () => {
           src="/logo.png"
           alt="logo"
           className="logo"
-          onClick={() => navigate("/user-dashboard")}
+          onClick={() => navigate("/")}
           style={{ cursor: "pointer" }}
         />
 
