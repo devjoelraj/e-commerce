@@ -10,6 +10,7 @@ import {
 } from "../../api/userServices/productsServices";
 import "./productLists.css";
 import ProductListSkeleton from "../loading/productListSkeletion";
+import { getoffersService } from "../../api/userServices/userDashboard";
 
 const ProductLists = () => {
   const location = useLocation();
@@ -30,6 +31,9 @@ const ProductLists = () => {
           response = await getPantsProductsService();
         } else if (category === "Shirts") {
           response = await getShirtsProductsService();
+        } else if (category === "Deals") {
+          response = await getoffersService();
+          console.log(response);
         } else if (
           category === "Shoes" ||
           category === "Slippers" ||

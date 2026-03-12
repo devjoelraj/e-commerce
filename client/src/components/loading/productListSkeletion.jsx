@@ -1,8 +1,8 @@
 import React from "react";
 import "./productListSkeleton.css";
 
-const ProductListSkeleton = () => {
-  const skeletonArray = Array(10).fill(0);
+const ProductListSkeleton = ({ count = 10 }) => {
+  const skeletonArray = Array.from({ length: count }, (_, i) => i);
 
   return (
     <>

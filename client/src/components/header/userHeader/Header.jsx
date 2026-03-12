@@ -62,9 +62,7 @@ const Header = () => {
         break;
 
       case "Deals":
-        navigate("/user-dashboard", {
-          state: { scrollToDeals: true },
-        });
+        navigate("/productLists", { state: { category: "Deals" } });
         break;
 
       case "Trends":
