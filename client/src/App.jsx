@@ -18,65 +18,96 @@ import UploadShirts from "./screens/adminScreen/addProduct/UploadProduct/product
 import UploadProducts from "./screens/adminScreen/addProduct/UploadProduct/products/Products";
 import AllProducts from "./screens/adminScreen/allProducts";
 import Login from "./screens/authScreens/login";
-// const Login = lazy(() => import("./screens/authScreens/login/Login"));
-// const Otp = lazy(() => import("./screens/authScreens/otp/Otp"));
-// const ForgetPassword = lazy(
-//   () =>
-//     import("./screens/authScreens/passwordScreens/forgetPasswords/ForgetPasswords"),
-// );
-// const CreatePassword = lazy(
-//   () => import("./screens/authScreens/passwordScreens/CreatePassword"),
-// );
+import apiClient from "./api/apiClient";
+import { tokenManager } from "./api/tokenManager";
+import ProtectedUserRoute from "./routes/ProtectedUserRoute";
+import ProtectedAdminRoute from "./routes/ProtectAdminRoute";
+import { AuthProvider } from "./context/AuthContext";
 
-// const AdminDashboard = lazy(
-//   () => import("./screens/adminScreen/adminDashboard/AdminDashboard"),
-// );
+// Lazy-loaded components
 const UserDashboard = lazy(
   () => import("./screens/userScreens/userDashBoard/UserDashBoard"),
 );
 
 function App() {
   return (
-    <BrowserRouter>
-      <Suspense
-        fallback={
-          <div style={{ textAlign: "center", marginTop: "20px" }}>
-            Loading...
-          </div>
-        }
-      >
-        <Routes>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashBoardHome />} />
-            <Route path="admin-dashboard" element={<AdminDashBoardHome />} />
-            <Route path="admin-AddProduct" element={<AddProduct />} />
-            <Route path="DashboardSilders" element={<DashboardSilders />} />
-            <Route path="add-offer-product" element={<OfferProducts />} />
-            <Route path="sel-upload-products" element={<UploadProducts />} />
-            <Route path="upload-product-shirts" element={<UploadShirts />} />
-            <Route path="upload-product-pants" element={<UploadPants />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Suspense
+          fallback={
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+              Loading...
+            </div>
+          }
+        >
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<UserDashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/product/pants/:id" element={<ProductDetails />} />
+            <Route path="/product/shirts/:id" element={<ProductDetails />} />
+            <Route path="/product/footwear/:id" element={<ProductDetails />} />
             <Route
-              path="upload-product-accessiors"
-              element={<UploadAccessiors />}
+              path="/product/accessories/:id"
+              element={<ProductDetails />}
             />
-            <Route path="upload-product-footWears" element={<FootWears />} />
-            <Route path="ordersPage-details" element={<OrdersPage />} />
-            <Route path="AllProducts-details" element={<AllProducts />} />
-          </Route>
+            <Route path="/ProductLists" element={<ProductLists />} />
 
-          <Route path="/" element={<UserDashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/product/pants/:id" element={<ProductDetails />} />
-          <Route path="/product/shirts/:id" element={<ProductDetails />} />
-          <Route path="/product/footwear/:id" element={<ProductDetails />} />
-          <Route path="/product/accessories/:id" element={<ProductDetails />} />
-          <Route path="/ProductLists" element={<ProductLists />} />
-          <Route path="/WatchList" element={<WatchList />} />
-          <Route path="/AddToCart" element={<AddToCart />} />
-          <Route path="/Profile" element={<Profile />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+            {/* Protected User Routes */}
+            <Route
+              path="/WatchList"
+              element={
+                <ProtectedUserRoute>
+                  <WatchList />
+                </ProtectedUserRoute>
+              }
+            />
+            <Route
+              path="/AddToCart"
+              element={
+                <ProtectedUserRoute>
+                  <AddToCart />
+                </ProtectedUserRoute>
+              }
+            />
+            <Route
+              path="/Profile"
+              element={
+                <ProtectedUserRoute>
+                  <Profile />
+                </ProtectedUserRoute>
+              }
+            />
+
+            {/* Protected Admin Routes (using layout) */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedAdminRoute>
+                  <AdminLayout />
+                </ProtectedAdminRoute>
+              }
+            >
+              <Route index element={<AdminDashBoardHome />} />
+              <Route path="admin-dashboard" element={<AdminDashBoardHome />} />
+              <Route path="admin-AddProduct" element={<AddProduct />} />
+              <Route path="DashboardSilders" element={<DashboardSilders />} />
+              <Route path="add-offer-product" element={<OfferProducts />} />
+              <Route path="sel-upload-products" element={<UploadProducts />} />
+              <Route path="upload-product-shirts" element={<UploadShirts />} />
+              <Route path="upload-product-pants" element={<UploadPants />} />
+              <Route
+                path="upload-product-accessiors"
+                element={<UploadAccessiors />}
+              />
+              <Route path="upload-product-footWears" element={<FootWears />} />
+              <Route path="ordersPage-details" element={<OrdersPage />} />
+              <Route path="AllProducts-details" element={<AllProducts />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

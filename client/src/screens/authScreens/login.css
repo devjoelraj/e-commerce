@@ -83,6 +83,9 @@
 
 .auth__checkbox {
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .auth__link {
@@ -137,6 +140,7 @@
   border: 1px solid #ccc;
   text-align: center;
   font-size: 18px;
+  padding: 4px 14px !important;
 }
 
 /* ------------------ */

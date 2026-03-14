@@ -7,6 +7,7 @@ const ContinueButton = ({
   disabled = false,
   loading = false,
   style = {},
+  type = "button",
 }) => {
   return (
     <button
@@ -14,6 +15,7 @@ const ContinueButton = ({
       onClick={onClick}
       disabled={disabled || loading}
       style={style}
+      type={type}
     >
       {loading ? <span className="spinner"></span> : text}
     </button>
