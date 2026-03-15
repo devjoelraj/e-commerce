@@ -78,18 +78,34 @@ export const createShirtsProductService = async ({
   return shirtsProduct;
 };
 
-export const getShirtsProductsService = async (filters = {}) => {
-  return await shirtsModel
+export const getShirtsProductsService = async (
+  filters = {},
+  page = 1,
+  limit = 15,
+) => {
+  const skip = (page - 1) * limit;
+
+  const products = await shirtsModel
     .find(filters)
     .populate("createdBy", "email")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await shirtsModel.countDocuments(filters);
+
+  return {
+    products,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 
 export const getShirtsProductByIdService = async (id) => {
   return await Shirts.findById(id).populate("createdBy", "email");
 };
 
-// Add a new color variant to an existing shirts product
 export const addColorVariantService = async (
   productId,
   colorsString,

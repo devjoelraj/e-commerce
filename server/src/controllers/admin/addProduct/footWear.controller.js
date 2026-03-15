@@ -88,7 +88,8 @@ export const addColorVariantController = async (req, res) => {
 
 export const getShoesProducts = async (req, res) => {
   try {
-    const { isActive, type } = req.query;
+    const { isActive, type, page = 1, limit = 15 } = req.query;
+
     const filters = {};
     if (isActive !== undefined) {
       filters.isActive = isActive === "true";
@@ -97,11 +98,14 @@ export const getShoesProducts = async (req, res) => {
       filters.type = type;
     }
 
-    const products = await getShoesProductsService(filters);
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+
+    const result = await getShoesProductsService(filters, pageNum, limitNum);
+
     res.json({
       success: true,
-      count: products.length,
-      data: products,
+      ...result,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

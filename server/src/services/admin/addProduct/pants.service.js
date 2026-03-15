@@ -78,10 +78,27 @@ export const createPantsProductService = async ({
   return pantsProduct;
 };
 
-export const getPantsProductsService = async (filters = {}) => {
-  return await Pants.find(filters)
+export const getPantsProductsService = async (
+  filters = {},
+  page = 1,
+  limit = 15,
+) => {
+  const skip = (page - 1) * limit;
+
+  const products = await Pants.find(filters)
     .populate("createdBy", "email")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Pants.countDocuments(filters);
+
+  return {
+    products,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 
 export const addColorVariantService = async (

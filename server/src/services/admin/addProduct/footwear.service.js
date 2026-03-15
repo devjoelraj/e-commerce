@@ -80,11 +80,28 @@ export const createShoesProductService = async ({
   return shoesProduct;
 };
 
-export const getShoesProductsService = async (filters = {}) => {
-  return await footWear
+export const getShoesProductsService = async (
+  filters = {},
+  page = 1,
+  limit = 15,
+) => {
+  const skip = (page - 1) * limit;
+
+  const products = await footWear
     .find(filters)
     .populate("createdBy", "email")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await footWear.countDocuments(filters);
+
+  return {
+    products,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 export const getFootwearProductByIdService = async (id) => {
   return await footWear.findById(id).populate("createdBy", "email");

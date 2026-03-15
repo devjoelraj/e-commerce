@@ -86,17 +86,21 @@ export const addColorVariantController = async (req, res) => {
 
 export const getShirtsProducts = async (req, res) => {
   try {
-    const { isActive } = req.query;
+    const { isActive, page = 1, limit = 15 } = req.query;
+
     const filters = {};
     if (isActive !== undefined) {
       filters.isActive = isActive === "true";
     }
 
-    const products = await getShirtsProductsService(filters);
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+
+    const result = await getShirtsProductsService(filters, pageNum, limitNum);
+
     res.json({
       success: true,
-      count: products.length,
-      data: products,
+      ...result,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

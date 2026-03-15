@@ -67,10 +67,27 @@ export const createAccessoriesProductService = async ({
 };
 
 // ---------- GET ALL PRODUCTS ----------
-export const getAccessoriesProductsService = async (filters = {}) => {
-  return await Accessories.find(filters)
+export const getAccessoriesProductsService = async (
+  filters = {},
+  page = 1,
+  limit = 15,
+) => {
+  const skip = (page - 1) * limit;
+
+  const products = await Accessories.find(filters)
     .populate("createdBy", "email")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Accessories.countDocuments(filters);
+
+  return {
+    products,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 
 // ---------- ADD NEW COLOR VARIANT ----------

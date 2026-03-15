@@ -1,7 +1,7 @@
 import {
   createAccessoriesProductService,
-  getAccessoriesProductsService,
   addColorVariantService,
+  getAccessoriesProductsService,
 } from "../../../services/admin/addProduct/accessories.service.js";
 
 // ---------- CREATE PRODUCT ----------
@@ -85,16 +85,24 @@ export const addColorVariantController = async (req, res) => {
 // ---------- GET ALL PRODUCTS ----------
 export const getAccessoriesProducts = async (req, res) => {
   try {
-    const { isActive, type } = req.query;
+    const { isActive, type, page = 1, limit = 15 } = req.query;
+
     const filters = {};
     if (isActive !== undefined) filters.isActive = isActive === "true";
     if (type !== undefined) filters.type = type;
 
-    const products = await getAccessoriesProductsService(filters);
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+
+    const result = await getAccessoriesProductsService(
+      filters,
+      pageNum,
+      limitNum,
+    );
+
     res.json({
       success: true,
-      count: products.length,
-      data: products,
+      ...result,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

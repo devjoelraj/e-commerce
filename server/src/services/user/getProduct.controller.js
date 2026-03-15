@@ -34,3 +34,34 @@ export const getOfferProductsService = async () => {
 
   return formattedProducts;
 };
+
+export const getAllProductsUserService = async (page = 1, limit = 15) => {
+  const [shirts, pants, footwear, accessories] = await Promise.all([
+    Shirts.find({ isActive: true }).sort({ createdAt: -1 }),
+    Pants.find({ isActive: true }).sort({ createdAt: -1 }),
+    footWear.find({ isActive: true }).sort({ createdAt: -1 }),
+    Accessories.find({ isActive: true }).sort({ createdAt: -1 }),
+  ]);
+
+  const formattedProducts = [
+    ...shirts.map((item) => ({ ...item.toObject(), category: "shirts" })),
+    ...pants.map((item) => ({ ...item.toObject(), category: "pants" })),
+    ...footwear.map((item) => ({ ...item.toObject(), category: "footwear" })),
+    ...accessories.map((item) => ({
+      ...item.toObject(),
+      category: "accessories",
+    })),
+  ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // sort by newest
+
+  const total = formattedProducts.length;
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginatedProducts = formattedProducts.slice(start, end);
+
+  return {
+    products: paginatedProducts,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+};

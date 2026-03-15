@@ -1,4 +1,5 @@
 import {
+  getAllProductsUserService,
   getOfferProductsService,
   getPantsProductByIdService,
 } from "../../services/user/getProduct.controller.js";
@@ -32,5 +33,16 @@ export const getOfferProducts = async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+};
+
+export const getAllProductsUser = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+    const result = await getAllProductsUserService(page, limit);
+    res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
