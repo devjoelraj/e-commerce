@@ -88,7 +88,7 @@
   color: #555;
 }
 
- @media (max-width: 768px) {
+@media (max-width: 768px) {
   .product-image {
     height: 180px;
   }
@@ -99,5 +99,29 @@
 
   .add-to-cart {
     font-size: 0.9rem;
+  }
+}
+
+.heart-icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.filled-heart {
+  color: red;
+}
+
+.heart-loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-top: 2px solid red;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
   }
 }

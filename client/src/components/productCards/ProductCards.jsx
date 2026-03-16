@@ -1,16 +1,55 @@
-import React from "react";
-import { FaHeart, FaStar } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaHeart, FaRegHeart, FaStar } from "react-icons/fa";
+import {
+  addToWatchlistService,
+  removeFromWatchlistService,
+} from "../../api/userServices/productsServices";
 import "./ProductCards.css";
-
+import presentToast from "../Toast/Toast";
 const ProductCards = ({
-  productname = "Cool T-Shirt",
-  actualValue = 234,
-  discountValue = 267,
-  startValue = 3,
-  reviewsCount = 64,
+  productId,
+  category,
+  productname = "please refresh the page",
+  actualValue = 404,
+  discountValue = 404,
+  startValue = 0,
+  reviewsCount = 404,
   image = "https://picsum.photos/200/300",
   onClick,
+  isWishlisted = false,
 }) => {
+  const [wishlisted, setWishlisted] = useState(isWishlisted);
+  const [loading, setLoading] = useState(false);
+
+  const handleWatchlist = async (e) => {
+    e.stopPropagation();
+
+    if (loading) return;
+
+    setLoading(true);
+
+    try {
+      if (wishlisted) {
+        const res = await removeFromWatchlistService(productId, category);
+        if (res?.success) {
+          setWishlisted(false);
+        }
+      } else {
+        const res = await addToWatchlistService(productId, category);
+        console.log(res.message, "m");
+        if (res?.success) {
+          setWishlisted(true);
+        } else {
+          presentToast.error(res.message || "Failed to add to watchlist");
+        }
+      }
+    } catch (error) {
+      console.error("Watchlist error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       className="product-card"
@@ -18,7 +57,16 @@ const ProductCards = ({
       style={{ cursor: "pointer" }}
     >
       <div className="product-header">
-        <FaHeart className="heart-icon" title="Add to Wishlist" />
+        {loading ? (
+          <div className="heart-loader"></div>
+        ) : wishlisted ? (
+          <FaHeart
+            className="heart-icon filled-heart"
+            onClick={handleWatchlist}
+          />
+        ) : (
+          <FaRegHeart className="heart-icon" onClick={handleWatchlist} />
+        )}
       </div>
 
       <img src={image} alt="product" className="product-image" />
@@ -36,9 +84,7 @@ const ProductCards = ({
           {[...Array(5)].map((_, i) => (
             <FaStar
               key={i}
-              style={{
-                color: i < startValue ? "#ffc107" : "#ccc",
-              }}
+              style={{ color: i < startValue ? "#ffc107" : "#ccc" }}
             />
           ))}
           <span className="review-count">({reviewsCount})</span>

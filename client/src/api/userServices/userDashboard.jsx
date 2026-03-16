@@ -8,7 +8,10 @@ export const getSilderService = async () => {
     }
     return { success: false, message: "Failed to get Silders data" };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: "something went wrong try after some time",
+    };
   }
 };
 
@@ -20,7 +23,10 @@ export const getoffersService = async () => {
     }
     return { success: false, message: "Failed to get Offers data" };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: "something went wrong try after some time",
+    };
   }
 };
 export const getShirtsProductByIdService = async (id) => {
@@ -31,7 +37,10 @@ export const getShirtsProductByIdService = async (id) => {
     }
     return { success: false, message: "Failed to fetch shirts product" };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: "something went wrong try after some time",
+    };
   }
 };
 
@@ -43,7 +52,10 @@ export const getFootwearProductByIdService = async (id) => {
     }
     return { success: false, message: "Failed to fetch footwear product" };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: "something went wrong try after some time",
+    };
   }
 };
 
@@ -55,6 +67,9 @@ export const getAccessoriesProductByIdService = async (id) => {
     }
     return { success: false, message: "Failed to fetch accessories product" };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: "something went wrong try after some time",
+    };
   }
 };

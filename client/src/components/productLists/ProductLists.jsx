@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Pagination } from "antd";
+
 import ProductCards from "../productCards/ProductCards";
 import Header from "../header/userHeader/Header";
+import ProductListSkeleton from "../loading/productListSkeletion";
+
 import {
   getAccessoriesProductsService,
   getAllproductsService,
   getFootwearProductsService,
   getPantsProductsService,
   getShirtsProductsService,
+  getWatchlistService,
 } from "../../api/userServices/productsServices";
+
 import { getoffersService } from "../../api/userServices/userDashboard";
-import ProductListSkeleton from "../loading/productListSkeletion";
+
 import "./productLists.css";
 
 const ProductLists = () => {
@@ -22,9 +27,13 @@ const ProductLists = () => {
   const type = location?.state?.type || null;
 
   const [products, setProducts] = useState([]);
+  const [watchlistIds, setWatchlistIds] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [page, setPage] = useState(1);
   const [limit] = useState(15);
+
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -35,17 +44,18 @@ const ProductLists = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+
       try {
-        let response;
+        let productPromise;
 
         if (category === "Pants") {
-          response = await getPantsProductsService(page, limit);
+          productPromise = getPantsProductsService(page, limit);
         } else if (category === "Shirts") {
-          response = await getShirtsProductsService(page, limit);
+          productPromise = getShirtsProductsService(page, limit);
         } else if (category === "Deals") {
-          response = await getoffersService();
+          productPromise = getoffersService();
         } else if (category === "All") {
-          response = await getAllproductsService(page, limit);
+          productPromise = getAllproductsService(page, limit);
         } else if (
           category === "Shoes" ||
           category === "Slippers" ||
@@ -58,22 +68,38 @@ const ProductLists = () => {
               : category === "Slippers"
                 ? "slipper"
                 : null);
-          response = await getFootwearProductsService(
+
+          productPromise = getFootwearProductsService(
             footwearType,
             page,
             limit,
           );
         } else if (category === "Accessories") {
-          response = await getAccessoriesProductsService(type, page, limit);
+          productPromise = getAccessoriesProductsService(type, page, limit);
         } else {
           setProducts([]);
+          setLoading(false);
           return;
         }
 
-        if (response?.success) {
-          setProducts(response.products || []);
-          setTotal(response.total || 0);
-          setTotalPages(response.totalPages || 0);
+        const [productRes, watchlistRes] = await Promise.all([
+          productPromise,
+          getWatchlistService(),
+        ]);
+        console.log(productRes, "offers response");
+        /* ---------- PRODUCTS ---------- */
+
+        if (productRes?.success) {
+          setProducts(productRes.products || []);
+          setTotal(productRes.total || 0);
+          setTotalPages(productRes.totalPages || 0);
+        }
+
+        /* ---------- WATCHLIST ---------- */
+
+        if (watchlistRes?.success) {
+          const ids = watchlistRes.data.map((item) => item._id);
+          setWatchlistIds(ids);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -85,6 +111,8 @@ const ProductLists = () => {
     fetchProducts();
   }, [category, type, page, limit]);
 
+  /* ---------- PRODUCT CLICK ---------- */
+
   const handleProductClick = (product) => {
     const routeMap = {
       Pants: "pants",
@@ -94,7 +122,9 @@ const ProductLists = () => {
       Footwear: "footwear",
       Accessories: "accessories",
     };
+
     const routeCategory = routeMap[category] || category.toLowerCase();
+
     navigate(`/product/${routeCategory}/${product._id}`, {
       state: { product },
     });
@@ -103,6 +133,7 @@ const ProductLists = () => {
   return (
     <div>
       <Header />
+
       <div className="product-list-container">
         {loading ? (
           <ProductListSkeleton />
@@ -110,15 +141,22 @@ const ProductLists = () => {
           products.map((product) => (
             <ProductCards
               key={product._id}
+              productId={product._id}
+              category={
+                product.category === "footwear" ? "Footwear" : product.category
+              }
               productname={product.productName}
               actualValue={product.pricing?.discountPrice}
               discountValue={product.pricing?.basePrice}
               image={product.colors?.[0]?.images?.[0]?.imageUrl}
+              isWishlisted={watchlistIds.includes(product._id)}
               onClick={() => handleProductClick(product)}
             />
           ))
         )}
       </div>
+
+      {/* ---------- PAGINATION ---------- */}
 
       {totalPages > 1 && (
         <div

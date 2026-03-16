@@ -76,3 +76,56 @@ export const getAllproductsService = async (page = 1, limit = 15) => {
     return { success: false, message: error.message };
   }
 };
+
+export const addToWatchlistService = async (productId, category) => {
+  try {
+    console.log("📤 addToWatchlistService called with:", {
+      productId,
+      category,
+    });
+
+    const response = await apiClient.post("/user/watchlist/add", {
+      productId,
+      category,
+    });
+    if (response?.status === 200) {
+      return response?.data;
+    }
+    return { success: false, message: "Failed to fetch watchlist products" };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong",
+    };
+  }
+};
+
+export const removeFromWatchlistService = async (productId, category) => {
+  try {
+    const response = await apiClient.post("/user/watchlist/remove", {
+      productId,
+      category,
+    });
+    if (response?.status === 200) {
+      return response?.data;
+    }
+    return { success: false, message: "Failed to fetch watchlist products" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const getWatchlistService = async () => {
+  try {
+    const response = await apiClient.get("/user/watchlist");
+    if (response?.status) {
+      return response?.data;
+    }
+    return { success: false, message: "Failed to fetch watchlist products" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};

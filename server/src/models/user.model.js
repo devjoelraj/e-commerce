@@ -26,6 +26,23 @@ const userSchema = new mongoose.Schema(
     resetOtpVerified: { type: Boolean, default: false },
     loginAttempts: { type: Number, default: 0 },
     lockUntil: Date,
+    watchlist: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        category: {
+          type: String,
+          required: true,
+          enum: ["Pants", "Shirts", "Footwear", "Accessories"],
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true },
 );

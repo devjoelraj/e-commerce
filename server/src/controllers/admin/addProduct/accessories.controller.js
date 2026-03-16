@@ -2,6 +2,7 @@ import {
   createAccessoriesProductService,
   addColorVariantService,
   getAccessoriesProductsService,
+  getAccessoriesProductByIdService,
 } from "../../../services/admin/addProduct/accessories.service.js";
 
 // ---------- CREATE PRODUCT ----------
