@@ -78,7 +78,7 @@ const ProductCards = ({
           <del>${discountValue}</del> ${actualValue}
         </p>
 
-        <button className="add-to-cart">Add to Cart</button>
+        <button className="add-to-cart">View Product</button>
 
         <div className="product-rating">
           {[...Array(5)].map((_, i) => (

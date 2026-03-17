@@ -56,7 +56,7 @@ const UserDashBoard = () => {
       ]);
 
       if (offerRes?.success) {
-        setOffersProducts(offerRes.data || []);
+        setOffersProducts(offerRes.products || []);
         console.log(offersProducts, "off");
       }
 

@@ -45,4 +45,5 @@ const accessoriesSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model("accessories", accessoriesSchema);
+export default mongoose.models.accessories ||
+  mongoose.model("accessories", accessoriesSchema);

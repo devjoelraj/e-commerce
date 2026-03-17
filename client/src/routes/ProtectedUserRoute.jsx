@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 
 const ProtectedUserRoute = ({ children }) => {
   const { isLoading, isAuthenticated } = useAuth();
-
+  console.log(isAuthenticated, "auth");
   if (isLoading) {
     return (
       <div style={{ textAlign: "center", marginTop: "20px" }}>

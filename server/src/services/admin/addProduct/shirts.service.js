@@ -103,7 +103,7 @@ export const getShirtsProductsService = async (
 };
 
 export const getShirtsProductByIdService = async (id) => {
-  return await Shirts.findById(id).populate("createdBy", "email");
+  return await shirtsModel.findById(id).populate("createdBy", "email");
 };
 
 export const addColorVariantService = async (

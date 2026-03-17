@@ -44,13 +44,14 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<UserDashboard />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/product/pants/:id" element={<ProductDetails />} />
+            {/* <Route path="/product/pants/:id" element={<ProductDetails />} />
             <Route path="/product/shirts/:id" element={<ProductDetails />} />
             <Route path="/product/footwear/:id" element={<ProductDetails />} />
             <Route
               path="/product/accessories/:id"
               element={<ProductDetails />}
-            />
+            /> */}
+            <Route path="/product/:category/:id" element={<ProductDetails />} />
             <Route path="/ProductLists" element={<ProductLists />} />
 
             {/* Protected User Routes */}

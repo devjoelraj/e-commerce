@@ -86,4 +86,4 @@ const shirtsSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model("shirts", shirtsSchema);
+export default mongoose.models.Shirts || mongoose.model("Shirts", shirtsSchema);

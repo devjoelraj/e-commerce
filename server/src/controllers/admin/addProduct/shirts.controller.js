@@ -1,7 +1,8 @@
 import {
-  getShirtsProductsService,
   createShirtsProductService,
   addColorVariantService,
+  getShirtsProductsService,
+  getShirtsProductByIdService,
 } from "../../../services/admin/addProduct/shirts.service.js";
 
 export const createShirtsProduct = async (req, res) => {

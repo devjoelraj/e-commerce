@@ -45,4 +45,5 @@ const footWearSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model("footWear", footWearSchema);
+export default mongoose.models.footWear ||
+  mongoose.model("footWear", footWearSchema);

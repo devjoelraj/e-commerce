@@ -88,4 +88,4 @@ const pantsSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model("Pants", pantsSchema);
+export default mongoose.models.Pants || mongoose.model("Pants", pantsSchema);

@@ -3,16 +3,20 @@ import { useLocation, useParams } from "react-router-dom";
 import { FaHeart, FaStar } from "react-icons/fa";
 import "./ProductDetails.css";
 import Header from "../header/userHeader/Header";
+
 import { getPantsProductByIdService } from "../../api/userServices/productsServices";
 import {
   getAccessoriesProductByIdService,
   getFootwearProductByIdService,
   getShirtsProductByIdService,
 } from "../../api/userServices/userDashboard";
+
+import presentToast from "../Toast/Toast";
 import DetailSkeleton from "../loading/detailSkeletion";
+import { addToCartService } from "../../api/userServices/addToCartService";
 
 const ProductDetails = () => {
-  const { category, id } = useParams();
+  const { category, id } = useParams(); // 👈 now category is captured
   const location = useLocation();
 
   const [product, setProduct] = useState(location.state?.product || null);
@@ -24,7 +28,9 @@ const ProductDetails = () => {
   const [selectedTab, setSelectedTab] = useState("details");
 
   const [imageLoading, setImageLoading] = useState(true);
+  const [cartLoading, setCartLoading] = useState(false);
 
+  /* 🔁 SERVICE MAP */
   const serviceMap = {
     pants: getPantsProductByIdService,
     shirts: getShirtsProductByIdService,
@@ -32,67 +38,128 @@ const ProductDetails = () => {
     accessories: getAccessoriesProductByIdService,
   };
 
-  /* Fetch Product */
+  /* 🔄 FETCH PRODUCT */
   useEffect(() => {
-    if (!product && id && category && serviceMap[category]) {
-      const fetchProduct = async () => {
-        try {
-          const response = await serviceMap[category](id);
+    const fetchProduct = async () => {
+      try {
+        if (!id || !category || !serviceMap[category]) return;
 
-          if (response?.success) {
-            setProduct(response.data);
+        const response = await serviceMap[category](id);
+        console.log("📦 Product API response:", response);
 
-            const firstImage =
-              response.data.colors?.[0]?.images?.[0]?.imageUrl || "";
+        if (response?.success && response.data) {
+          // Add category to product object (useful later)
+          const productWithCategory = {
+            ...response.data,
+            category: category,
+          };
+          setProduct(productWithCategory);
 
-            setSelectedImg(firstImage);
-          }
-        } catch (error) {
-          console.error("Failed to fetch product", error);
-        } finally {
-          setLoading(false);
+          const firstImage =
+            response.data.colors?.[0]?.images?.[0]?.imageUrl || "";
+          setSelectedImg(firstImage);
         }
-      };
+      } catch (error) {
+        console.error("❌ Fetch product error:", error);
+        presentToast.error("Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (!product) {
       fetchProduct();
-    } else if (product) {
+    } else {
       const firstImage = product.colors?.[0]?.images?.[0]?.imageUrl || "";
       setSelectedImg(firstImage);
       setLoading(false);
     }
-  }, [product, id, category]);
+  }, [id, category, product]);
 
-  /* Change image when color changes */
+  /* 🎨 IMAGE CHANGE ON COLOR CHANGE */
   useEffect(() => {
-    if (product && product.colors?.[selectedColorIndex]) {
-      const newImage =
-        product.colors[selectedColorIndex].images?.[0]?.imageUrl || "";
+    if (!product) return;
 
-      setImageLoading(true);
-      setSelectedImg(newImage);
-    }
+    const color = product.colors?.[selectedColorIndex];
+    const newImage = color?.images?.[0]?.imageUrl || "";
+
+    setImageLoading(true);
+    setSelectedImg(newImage);
+    setSelectedSize(null); // reset size
   }, [selectedColorIndex, product]);
 
+  /* 🛒 ADD TO CART */
+  const handleAddToCart = async () => {
+    if (cartLoading) return;
+
+    const selectedColor = product?.colors?.[selectedColorIndex];
+
+    console.log("🛒 ADD TO CART CLICKED");
+    console.log("🌐 URL category:", category);
+    console.log("📦 Product:", product);
+    console.log("🎨 Selected Color:", selectedColor);
+    console.log("📏 Selected Size:", selectedSize);
+
+    if (!product?._id) {
+      return presentToast.error("Product not found");
+    }
+
+    if (!selectedColor) {
+      return presentToast.error("Please select color");
+    }
+
+    if (category !== "accessories" && !selectedSize) {
+      return presentToast.error("Please select size");
+    }
+
+    // Format category (capitalize first letter)
+    const formattedCategory =
+      category.charAt(0).toUpperCase() + category.slice(1);
+
+    const payload = {
+      productId: product._id,
+      category: formattedCategory,
+      color: selectedColor.name,
+      size: selectedSize,
+      quantity: 1,
+    };
+
+    console.log("📦 Final Payload:", payload);
+
+    try {
+      setCartLoading(true);
+      const res = await addToCartService(payload);
+      if (res?.success) {
+        presentToast.success("Added to cart 🛒");
+      } else {
+        presentToast.error(res.message || "Failed to add");
+      }
+    } catch (error) {
+      presentToast.error(
+        error.response?.data?.message || "Something went wrong",
+      );
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
+  /* 🧱 LOADING STATES */
   if (loading) return <DetailSkeleton />;
   if (!product) return <div>Product not found</div>;
 
   return (
     <>
       <Header />
-
       <div className="product-details-container">
-        {/* LEFT SIDE IMAGES */}
+        {/* LEFT */}
         <div className="product-details-images-section">
-          {/* MAIN IMAGE */}
           <div className="product-details-main-image-wrapper">
             {imageLoading && (
               <div className="product-image-loader">
                 <div className="product-image-skeleton"></div>
               </div>
             )}
-
             <img
-              key={selectedImg}
               src={selectedImg}
               alt="Main"
               className={`product-details-main-image ${
@@ -101,8 +168,6 @@ const ProductDetails = () => {
               onLoad={() => setImageLoading(false)}
             />
           </div>
-
-          {/* THUMBNAILS */}
           <div className="product-details-thumbnail-row">
             {product.colors?.[selectedColorIndex]?.images?.map((img, index) => (
               <img
@@ -113,14 +178,13 @@ const ProductDetails = () => {
                 onClick={() => {
                   setImageLoading(true);
                   setSelectedImg(img.imageUrl);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
               />
             ))}
           </div>
         </div>
 
-        {/* RIGHT SIDE DETAILS */}
+        {/* RIGHT */}
         <div className="product-details-section">
           <p className="product-details-name">{product.productName}</p>
 
@@ -134,42 +198,35 @@ const ProductDetails = () => {
           </p>
 
           <h1 className="product-details-price">
-            ₹{product.pricing?.discountPrice || product.pricing?.basePrice}
+            ₹
+            {product.pricing?.discountPrice ||
+              product.pricing?.basePrice ||
+              "N/A"}
           </h1>
 
-          {/* COLOR OPTIONS */}
-          {product.colors?.length > 0 && (
-            <>
-              <p className="product-details-label">Color</p>
+          {/* COLOR */}
+          <p className="product-details-label">Color</p>
+          <div className="product-details-color-options">
+            {product.colors?.map((color, index) => (
+              <div
+                key={index}
+                className={`product-details-color-circle ${
+                  selectedColorIndex === index ? "selected" : ""
+                }`}
+                style={{ backgroundColor: color.hex }}
+                onClick={() => setSelectedColorIndex(index)}
+              />
+            ))}
+          </div>
 
-              <div className="product-details-color-options">
-                {product.colors.map((color, index) => (
-                  <div
-                    key={index}
-                    className={`product-details-color-circle ${
-                      selectedColorIndex === index ? "selected" : ""
-                    }`}
-                    style={{ backgroundColor: color.hex }}
-                    onClick={() => {
-                      setSelectedColorIndex(index);
-                      setSelectedSize(null);
-                    }}
-                    title={color.name}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* SIZE OPTIONS */}
-          {product.colors?.[selectedColorIndex]?.sizes?.length > 0 && (
+          {/* SIZE */}
+          {category !== "accessories" && (
             <>
               <p className="product-details-label">Size</p>
-
               <div className="product-details-size-buttons">
-                {product.colors[selectedColorIndex].sizes
-                  .filter((size) => size.qty > 0)
-                  .map((sizeObj) => (
+                {product.colors?.[selectedColorIndex]?.sizes
+                  ?.filter((s) => s.qty > 0)
+                  ?.map((sizeObj) => (
                     <button
                       key={sizeObj.size}
                       className={`product-details-size-btn ${
@@ -184,52 +241,24 @@ const ProductDetails = () => {
             </>
           )}
 
-          {/* ACTION BUTTONS */}
+          {/* ACTION */}
           <div className="product-details-actions">
-            <button className="product-details-add-to-cart">Add to cart</button>
+            <button
+              className="product-details-add-to-cart"
+              onClick={handleAddToCart}
+              disabled={cartLoading}
+              style={{
+                opacity: cartLoading ? 0.6 : 1,
+                cursor: cartLoading ? "not-allowed" : "pointer",
+              }}
+            >
+              {cartLoading ? "Adding..." : "Add to cart"}
+            </button>
 
             <FaHeart className="product-details-wishlist-icon" />
           </div>
 
           <p className="product-details-delivery-info">🚚 Free delivery</p>
-        </div>
-      </div>
-
-      {/* PRODUCT TABS */}
-      <div className="product-tabs-container">
-        <div className="product-tabs-header">
-          <p
-            className={`product-tab-button ${
-              selectedTab === "details" ? "active-tab" : ""
-            }`}
-            onClick={() => setSelectedTab("details")}
-          >
-            Details
-          </p>
-
-          <p
-            className={`product-tab-button ${
-              selectedTab === "reviews" ? "active-tab" : ""
-            }`}
-            onClick={() => setSelectedTab("reviews")}
-          >
-            Reviews
-          </p>
-        </div>
-
-        <div className="product-tab-content">
-          {selectedTab === "details" ? (
-            <div className="product-details-content">
-              <p>
-                <strong>Description:</strong>{" "}
-                {product.description || "No description available."}
-              </p>
-            </div>
-          ) : (
-            <div className="product-reviews-content">
-              <p>No reviews yet.</p>
-            </div>
-          )}
         </div>
       </div>
     </>
