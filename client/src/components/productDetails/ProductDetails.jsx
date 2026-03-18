@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { FaHeart, FaStar } from "react-icons/fa";
 import "./ProductDetails.css";
 import Header from "../header/userHeader/Header";
 
@@ -254,8 +253,6 @@ const ProductDetails = () => {
             >
               {cartLoading ? "Adding..." : "Add to cart"}
             </button>
-
-            <FaHeart className="product-details-wishlist-icon" />
           </div>
 
           <p className="product-details-delivery-info">🚚 Free delivery</p>

@@ -26,16 +26,50 @@ const ProductCards = ({
 
     if (loading) return;
 
+    // Normalize category to the format expected by backend (capitalized)
+    const normalizeCategory = (cat) => {
+      const map = {
+        shirts: "Shirts",
+        pants: "Pants",
+        footwear: "Footwear",
+        accessories: "Accessories",
+        shoe: "Footwear", // if type is passed instead of category
+        slipper: "Footwear",
+        watch: "Accessories",
+        chain: "Accessories",
+        ring: "Accessories",
+      };
+      // If it's already capitalized and in the allowed list, return as is
+      const allowed = ["Shirts", "Pants", "Footwear", "Accessories"];
+      if (allowed.includes(cat)) return cat;
+      // Otherwise try to map from lowercase or subtype
+      return map[cat?.toLowerCase()] || cat;
+    };
+
+    const normalizedCategory = normalizeCategory(category);
+    if (
+      !normalizedCategory ||
+      !["Shirts", "Pants", "Footwear", "Accessories"].includes(
+        normalizedCategory,
+      )
+    ) {
+      presentToast.error("Cannot add to watchlist: invalid category");
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (wishlisted) {
-        const res = await removeFromWatchlistService(productId, category);
+        const res = await removeFromWatchlistService(
+          productId,
+          normalizedCategory,
+        );
         if (res?.success) {
           setWishlisted(false);
         }
       } else {
-        const res = await addToWatchlistService(productId, category);
+        const res = await addToWatchlistService(productId, normalizedCategory);
         console.log(res.message, "m");
         if (res?.success) {
           setWishlisted(true);

@@ -30,63 +30,30 @@ export const addToCartService = async ({
   if (!userId || !productId || !category || !color) {
     throw new Error("Missing required fields");
   }
-
   if (quantity <= 0) throw new Error("Invalid quantity");
 
   const Model = getProductModel(category);
 
-  /* 🔐 ATOMIC STOCK LOCK */
-  let updateQuery;
-  let updateOperation;
-  let options;
+  // Optional: Check if product exists and has enough stock (but do NOT decrement)
+  const product = await Model.findById(productId);
+  if (!product) throw new Error("Product not found");
 
-  if (category === "Accessories") {
-    updateQuery = {
-      _id: productId,
-      "colors.name": color,
-      "colors.qty": { $gte: quantity },
-    };
+  const colorObj = product.colors.find((c) => c.name === color);
+  if (!colorObj) throw new Error("Color not found");
 
-    updateOperation = {
-      $inc: { "colors.$.qty": -quantity },
-    };
-
-    options = { new: true };
-  } else {
+  if (category !== "Accessories") {
     if (!size) throw new Error("Size required");
-
-    updateQuery = {
-      _id: productId,
-      "colors.name": color,
-      "colors.sizes.size": size,
-      "colors.sizes.qty": { $gte: quantity },
-    };
-
-    updateOperation = {
-      $inc: {
-        "colors.$[color].sizes.$[size].qty": -quantity,
-      },
-    };
-
-    options = {
-      new: true,
-      arrayFilters: [{ "color.name": color }, { "size.size": size }],
-    };
+    const sizeObj = colorObj.sizes.find((s) => s.size === size);
+    if (!sizeObj || sizeObj.qty < quantity)
+      throw new Error("Insufficient stock");
+  } else {
+    if (colorObj.qty < quantity) throw new Error("Insufficient stock");
   }
 
-  const updatedProduct = await Model.findOneAndUpdate(
-    updateQuery,
-    updateOperation,
-    options,
-  );
+  const price = product.pricing?.discountPrice || product.pricing?.basePrice;
+  if (!price) throw new Error("Product price not found");
 
-  if (!updatedProduct) {
-    throw new Error("Out of stock");
-  }
-
-  /* 🛒 CART LOGIC */
   let cart = await Cart.findOne({ userId });
-
   if (!cart) {
     cart = new Cart({ userId, items: [] });
   }
@@ -98,12 +65,10 @@ export const addToCartService = async ({
       item.color === color &&
       item.size === (category === "Accessories" ? null : size),
   );
-  const price =
-    updatedProduct.pricing?.discountPrice || updatedProduct.pricing?.basePrice;
-  if (!price) throw new Error("Product price not found");
+
   if (existingItem) {
     existingItem.quantity += quantity;
-    existingItem.addedAt = new Date(); // 🔄 refresh expiry
+    existingItem.addedAt = new Date();
   } else {
     cart.items.push({
       productId,
@@ -117,7 +82,6 @@ export const addToCartService = async ({
   }
 
   await cart.save();
-
   return cart;
 };
 
@@ -129,7 +93,6 @@ export const removeFromCartService = async ({
   size,
 }) => {
   const cart = await Cart.findOne({ userId });
-
   if (!cart) throw new Error("Cart not found");
 
   const itemIndex = cart.items.findIndex(
@@ -139,47 +102,11 @@ export const removeFromCartService = async ({
       item.color === color &&
       item.size === (category === "Accessories" ? null : size),
   );
-
   if (itemIndex === -1) throw new Error("Item not found in cart");
 
-  const item = cart.items[itemIndex];
-
-  const Model = getProductModel(category);
-
-  /* 🔄 RESTORE STOCK */
-  if (category === "Accessories") {
-    await Model.updateOne(
-      {
-        _id: productId,
-        "colors.name": color,
-      },
-      {
-        $inc: { "colors.$.qty": item.quantity },
-      },
-    );
-  } else {
-    await Model.updateOne(
-      {
-        _id: productId,
-        "colors.name": color,
-        "colors.sizes.size": size,
-      },
-      {
-        $inc: {
-          "colors.$[color].sizes.$[size].qty": item.quantity,
-        },
-      },
-      {
-        arrayFilters: [{ "color.name": color }, { "size.size": size }],
-      },
-    );
-  }
-
-  /* 🗑 Remove item */
+  // No stock restoration – just remove from cart
   cart.items.splice(itemIndex, 1);
-
   await cart.save();
-
   return cart;
 };
 
@@ -191,12 +118,9 @@ export const updateCartQuantityService = async ({
   size,
   newQuantity,
 }) => {
-  if (newQuantity <= 0) {
-    throw new Error("Quantity must be at least 1");
-  }
+  if (newQuantity <= 0) throw new Error("Quantity must be at least 1");
 
   const cart = await Cart.findOne({ userId });
-
   if (!cart) throw new Error("Cart not found");
 
   const item = cart.items.find(
@@ -206,116 +130,33 @@ export const updateCartQuantityService = async ({
       item.color === color &&
       item.size === (category === "Accessories" ? null : size),
   );
-
   if (!item) throw new Error("Item not found");
 
-  const oldQuantity = item.quantity;
-  const diff = newQuantity - oldQuantity;
-
+  // Optional: Check if the new quantity is still within stock limits
   const Model = getProductModel(category);
+  const product = await Model.findById(productId);
+  if (!product) throw new Error("Product not found");
 
-  /* 🔼 INCREASE QTY */
-  if (diff > 0) {
-    let updateQuery;
-    let updateOperation;
-    let options;
+  const colorObj = product.colors.find((c) => c.name === color);
+  if (!colorObj) throw new Error("Color not found");
 
-    if (category === "Accessories") {
-      updateQuery = {
-        _id: productId,
-        "colors.name": color,
-        "colors.qty": { $gte: diff },
-      };
-
-      updateOperation = {
-        $inc: { "colors.$.qty": -diff },
-      };
-
-      options = { new: true };
-    } else {
-      updateQuery = {
-        _id: productId,
-        "colors.name": color,
-        "colors.sizes.size": size,
-        "colors.sizes.qty": { $gte: diff },
-      };
-
-      updateOperation = {
-        $inc: {
-          "colors.$[color].sizes.$[size].qty": -diff,
-        },
-      };
-
-      options = {
-        arrayFilters: [{ "color.name": color }, { "size.size": size }],
-      };
-    }
-
-    const updated = await Model.findOneAndUpdate(
-      updateQuery,
-      updateOperation,
-      options,
-    );
-
-    if (!updated) {
-      throw new Error("Not enough stock");
-    }
+  if (category !== "Accessories") {
+    if (!size) throw new Error("Size required");
+    const sizeObj = colorObj.sizes.find((s) => s.size === size);
+    if (!sizeObj || sizeObj.qty < newQuantity)
+      throw new Error("Insufficient stock");
+  } else {
+    if (colorObj.qty < newQuantity) throw new Error("Insufficient stock");
   }
 
-  /* 🔽 DECREASE QTY */
-  if (diff < 0) {
-    const restoreQty = Math.abs(diff);
-
-    if (category === "Accessories") {
-      await Model.updateOne(
-        {
-          _id: productId,
-          "colors.name": color,
-        },
-        {
-          $inc: { "colors.$.qty": restoreQty },
-        },
-      );
-    } else {
-      await Model.updateOne(
-        {
-          _id: productId,
-          "colors.name": color,
-          "colors.sizes.size": size,
-        },
-        {
-          $inc: {
-            "colors.$[color].sizes.$[size].qty": restoreQty,
-          },
-        },
-        {
-          arrayFilters: [{ "color.name": color }, { "size.size": size }],
-        },
-      );
-    }
-  }
-
-  /* 🛒 UPDATE CART */
   item.quantity = newQuantity;
-  item.addedAt = new Date(); // refresh expiry
-
+  item.addedAt = new Date();
   await cart.save();
-
   return cart;
 };
 
 export const getCartService = async (userId) => {
   const cart = await Cart.findOne({ userId });
-
-  if (!cart) {
-    return {
-      items: [],
-      totalItems: 0,
-    };
-  }
-
-  return {
-    items: cart.items,
-    totalItems: cart.items.length,
-  };
+  if (!cart) return { items: [], totalItems: 0 };
+  return { items: cart.items, totalItems: cart.items.length };
 };

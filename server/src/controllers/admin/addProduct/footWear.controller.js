@@ -2,6 +2,7 @@ import {
   createShoesProductService,
   getShoesProductsService,
   addColorVariantService,
+  getFootwearProductByIdService,
 } from "../../../services/admin/addProduct/footwear.service.js";
 
 export const createShoesProduct = async (req, res) => {

@@ -28,6 +28,7 @@ import { AuthProvider } from "./context/AuthContext";
 const UserDashboard = lazy(
   () => import("./screens/userScreens/userDashBoard/UserDashBoard"),
 );
+import myIcon from "./assets/loader.svg";
 
 function App() {
   return (
@@ -35,8 +36,17 @@ function App() {
       <BrowserRouter>
         <Suspense
           fallback={
-            <div style={{ textAlign: "center", marginTop: "20px" }}>
-              Loading...
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "80vh",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
+              <img src={myIcon} alt="description" className="my-icon" />
             </div>
           }
         >

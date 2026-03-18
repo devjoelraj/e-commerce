@@ -28,7 +28,7 @@ app.use(cookieParser());
 if (nodeEnv === "development") {
   app.use(morgan("dev"));
 }
-app.use(globalLimiter);
+// app.use(globalLimiter);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRouter);
 app.use("/user", userRouter);
