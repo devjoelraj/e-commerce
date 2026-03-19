@@ -15,15 +15,13 @@ export const getAllOrders = async () => {
   }
 };
 
-export const updateOrderStatus = async (orderId, status) => {
+export const updateOrderStatus = async (orderId, status, emailMessage) => {
   try {
     const response = await apiClient.put(`/admin/orders/${orderId}/status`, {
       status,
+      emailMessage,
     });
-    if (response?.status === 200) {
-      return response.data;
-    }
-    return { success: false, message: "Failed to get all products" };
+    return response.data;
   } catch (error) {
     return {
       success: false,

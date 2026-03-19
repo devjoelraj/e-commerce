@@ -20,6 +20,11 @@ export const updateOrderStatus = async (req, res) => {
     const { orderId } = req.params;
     const { status, emailMessage } = req.body;
 
+    console.log("📥 [updateOrderStatus] Request received");
+    console.log("   orderId:", orderId);
+    console.log("   status:", status);
+    console.log("   emailMessage provided:", !!emailMessage);
+
     const validStatuses = [
       "pending",
       "confirmed",
@@ -33,10 +38,17 @@ export const updateOrderStatus = async (req, res) => {
         .json({ success: false, message: "Invalid status" });
     }
 
+    // Fetch the order
     const order = await Order.findById(orderId);
-    if (!order) throw new Error("Order not found");
+    if (!order) {
+      console.log("❌ Order not found:", orderId);
+      throw new Error("Order not found");
+    }
+    console.log("✅ Order found, current status:", order.orderStatus);
 
+    // If cancelling, restore stock first
     if (status === "cancelled" && order.orderStatus !== "cancelled") {
+      console.log("🔄 Restoring stock for order:", orderId);
       for (const item of order.items) {
         const Model = getProductModel(item.category);
         const product = await Model.findById(item.productId);
@@ -66,13 +78,8 @@ export const updateOrderStatus = async (req, res) => {
           );
         } else {
           updateResult = await Model.updateOne(
-            {
-              _id: item.productId,
-              "colors.name": item.color,
-            },
-            {
-              $inc: { "colors.$.qty": item.quantity },
-            },
+            { _id: item.productId, "colors.name": item.color },
+            { $inc: { "colors.$.qty": item.quantity } },
           );
         }
 
@@ -80,32 +87,53 @@ export const updateOrderStatus = async (req, res) => {
           throw new Error(`Failed to restore stock for ${product.productName}`);
         }
       }
+      console.log("✅ Stock restored");
     }
 
-    // Now update the order status
+    // Update order status
     const updatedOrder = await updateOrderStatusService(orderId, status);
+    console.log("✅ Order status updated to:", updatedOrder.orderStatus);
 
-    // If cancelled and email provided, send email
+    // If cancelled and email message provided, send email
     if (status === "cancelled" && emailMessage) {
+      console.log("📧 Attempting to send cancellation email...");
       await updatedOrder.populate("userId", "email");
       const userEmail = updatedOrder.userId?.email;
+      console.log("   User email from DB:", userEmail || "NOT FOUND");
+
       if (userEmail) {
-        await sendEmail({
-          to: userEmail,
-          subject: "Your Order Has Been Cancelled",
-          html: `
-            <h3>Order Cancellation</h3>
-            <p>Your order #${updatedOrder._id} has been cancelled.</p>
-            <p>Message from the seller:</p>
-            <p>${emailMessage}</p>
-            <p>If you have any questions, please contact support.</p>
-          `,
-        });
+        try {
+          await sendEmail({
+            to: userEmail,
+            subject: "Your Order Has Been Cancelled",
+            html: `
+              <h3>Order Cancellation</h3>
+              <p>Your order #${updatedOrder._id} has been cancelled.</p>
+              <p>Message from the seller:</p>
+              <p>${emailMessage}</p>
+              <p>If you have any questions, please contact support.</p>
+            `,
+          });
+          console.log("✅ Email sent successfully to:", userEmail);
+        } catch (emailError) {
+          console.error("❌ Email sending failed:", emailError);
+          // Optionally, you could still return success for the order cancellation,
+          // but log the email failure.
+        }
+      } else {
+        console.warn(
+          "⚠️ No user email found – cannot send cancellation email.",
+        );
       }
+    } else {
+      console.log(
+        "⏭️ Skipping email – status not cancelled or no email message.",
+      );
     }
 
     res.json({ success: true, order: updatedOrder });
   } catch (error) {
+    console.error("❌ Error in updateOrderStatus:", error);
     res.status(400).json({ success: false, message: error.message });
   }
 };
