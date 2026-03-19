@@ -43,8 +43,8 @@ export const placeOrderService = async ({
 
     const colorObj = product.colors.find((c) => c.name === item.color);
     if (!colorObj) throw new Error(`Color ${item.color} not available`);
+    const imageUrl = colorObj.images?.[0]?.imageUrl || "";
 
-    // Atomic stock decrement
     let updateResult;
     if (item.category !== "Accessories") {
       if (!item.size) throw new Error("Size missing");
@@ -84,7 +84,6 @@ export const placeOrderService = async ({
 
     const price = item.priceAtAdded;
     totalAmount += price * item.quantity;
-
     orderItems.push({
       productId: item.productId,
       category: item.category,
@@ -93,24 +92,27 @@ export const placeOrderService = async ({
       size: item.size,
       quantity: item.quantity,
       priceAtPurchase: price,
+      image: imageUrl,
     });
   }
 
-  // 6. Create order
   const order = new Order({
     userId,
     items: orderItems,
     totalAmount,
     shippingAddress: addressData,
     paymentStatus: "pending",
-    orderStatus: "confirmed",
+    orderStatus: "pending",
     idempotencyKey,
   });
 
   await order.save();
 
-  // 7. Clear cart
   await Cart.deleteOne({ userId });
 
   return order;
+};
+
+export const getUserOrdersService = async (userId) => {
+  return await Order.find({ userId }).sort({ createdAt: -1 });
 };

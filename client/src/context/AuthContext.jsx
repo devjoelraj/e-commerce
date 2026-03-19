@@ -9,7 +9,17 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  console.log("hiih");
+
+  const setAuth = (token) => {
+    if (token) {
+      tokenManager.setToken(token);
+      setIsAuthenticated(true);
+    } else {
+      tokenManager.clearToken();
+      setIsAuthenticated(false);
+    }
+  };
+
   useEffect(() => {
     const restoreSession = async () => {
       try {
@@ -36,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoading, isAuthenticated }}>
+    <AuthContext.Provider value={{ isLoading, isAuthenticated, setAuth }}>
       {children}
     </AuthContext.Provider>
   );

@@ -18,8 +18,6 @@ import UploadShirts from "./screens/adminScreen/addProduct/UploadProduct/product
 import UploadProducts from "./screens/adminScreen/addProduct/UploadProduct/products/Products";
 import AllProducts from "./screens/adminScreen/allProducts";
 import Login from "./screens/authScreens/login";
-import apiClient from "./api/apiClient";
-import { tokenManager } from "./api/tokenManager";
 import ProtectedUserRoute from "./routes/ProtectedUserRoute";
 import ProtectedAdminRoute from "./routes/ProtectAdminRoute";
 import { AuthProvider } from "./context/AuthContext";

@@ -25,6 +25,10 @@ import {
   getUserOrders,
   placeOrder,
 } from "../controllers/user/order.controller.js";
+import {
+  cancelOrder,
+  getProfileData,
+} from "../controllers/user/profile.controller.js";
 
 const router = express.Router();
 
@@ -48,5 +52,8 @@ router.post("/address", protect, saveAddress);
 
 router.post("/order/place", protect, placeOrder);
 router.get("/order", protect, getUserOrders);
+
+router.get("/getprofile", protect, getProfileData);
+router.post("/profile/cancel/:orderId", protect, cancelOrder);
 
 export default router;

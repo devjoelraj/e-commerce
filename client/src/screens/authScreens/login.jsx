@@ -17,11 +17,13 @@ import {
 } from "../../api/authScreens/authServices";
 import { useNavigate } from "react-router-dom";
 import { tokenManager } from "../../api/tokenManager";
+import { useAuth } from "../../context/AuthContext";
 
 const { Password } = Input;
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setAuth } = useAuth();
   const [mode, setMode] = useState("login");
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -191,6 +193,7 @@ const Login = () => {
       const result = await loginService(loginData.email, loginData.password);
       if (result?.success) {
         tokenManager.setToken(result.accessToken);
+        setAuth(result.accessToken);
         presentTost.success("Login successful");
         navigate("/");
       } else {

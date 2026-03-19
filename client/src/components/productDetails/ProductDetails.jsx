@@ -187,15 +187,6 @@ const ProductDetails = () => {
         <div className="product-details-section">
           <p className="product-details-name">{product.productName}</p>
 
-          <p className="product-details-rating">
-            {[...Array(5)].map((_, i) => (
-              <FaStar
-                key={i}
-                color={i < (product.rating || 4) ? "#ffc107" : "#ccc"}
-              />
-            ))}
-          </p>
-
           <h1 className="product-details-price">
             ₹
             {product.pricing?.discountPrice ||

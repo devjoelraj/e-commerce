@@ -2,33 +2,36 @@ import React from "react";
 import "./OrderCard.css";
 
 const OrderCard = ({ productname, price, image, status, onCancel }) => {
-  return (
-    <div
-      className="order-card"
-      style={{
-        opacity: status === "CANCEL_REQUESTED" ? 0.6 : 1,
-      }}
-    >
-      <img src={image} alt="product" className="order-image" />
+  const getStatusDisplay = () => {
+    switch (status) {
+      case "pending":
+        return { text: "Pending", color: "#ff9800" };
+      case "shipped":
+        return { text: "Shipped", color: "#2196f3" };
+      case "delivered":
+        return { text: "Delivered", color: "#4caf50" };
+      case "cancelled":
+        return { text: "Cancelled", color: "#f44336" };
+      default:
+        return { text: status, color: "#888" };
+    }
+  };
 
+  const statusDisplay = getStatusDisplay();
+
+  return (
+    <div className="order-card">
+      <img src={image} alt="product" className="order-image" />
       <div className="order-info">
         <h3>{productname}</h3>
-        <p>${price}</p>
-
-        {status === "PLACED" && (
+        <p>₹{price}</p>
+        <p style={{ color: statusDisplay.color, fontWeight: "bold" }}>
+          {statusDisplay.text}
+        </p>
+        {status === "pending" && onCancel && (
           <button className="cancel-btn" onClick={onCancel}>
             Cancel Order
           </button>
-        )}
-
-        {status === "CANCEL_REQUESTED" && (
-          <p className="pending-text">Under Verification</p>
-        )}
-
-        {status === "DELIVERED" && <p className="delivered-text">Delivered</p>}
-
-        {status === "CANCELLED" && (
-          <p className="cancelled-text">Order Cancelled</p>
         )}
       </div>
     </div>

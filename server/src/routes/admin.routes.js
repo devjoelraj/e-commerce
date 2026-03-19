@@ -39,6 +39,10 @@ import {
   getAllProducts,
   updateProduct,
 } from "../controllers/admin/getAllProduct.controller.js";
+import {
+  getAllOrders,
+  updateOrderStatus,
+} from "../controllers/admin/order.controller.js";
 
 const router = express.Router();
 
@@ -109,5 +113,8 @@ router.post(
 router.post("/deleteProduct", deleteProduct);
 router.get("/allProducts", getAllProducts);
 router.post("/updateProduct", updateProduct);
+
+router.get("/orders", getAllOrders);
+router.put("/orders/:orderId/status", updateOrderStatus);
 
 export default router;

@@ -1,37 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "antd";
 import Header from "../../../components/header/userHeader/Header";
 import OrderCard from "../../../components/orderCards/OrderCard";
+import presentToast from "../../../components/Toast/Toast";
+import { tokenManager } from "../../../api/tokenManager";
 import "./Profile.css";
+import {
+  cancelOrder,
+  getUserProfile,
+  logoutService,
+} from "../../../api/userServices/getProfile";
+import myIcon from "../../../assets/loader.svg";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [activeOrders, setActiveOrders] = useState([]);
+  const [orderHistory, setOrderHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [cancelling, setCancelling] = useState(false); // 👈 loading for cancel
 
-  const [user] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      productname: "Cool T-Shirt",
-      price: 234,
-      image: "https://picsum.photos/200/300",
-      status: "PLACED",
-    },
-    {
-      id: 2,
-      productname: "Sneakers",
-      price: 999,
-      image: "https://picsum.photos/200/301",
-      status: "DELIVERED",
-    },
-  ]);
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
-  const handleLogout = () => {
-    navigate("/");
+  const fetchProfile = async () => {
+    setLoading(true);
+    const res = await getUserProfile();
+    console.log(res, "res");
+    if (res.success) {
+      setUser(res.user);
+      setActiveOrders(res.activeOrders || []);
+      setOrderHistory(res.orderHistory || []);
+    } else {
+      presentToast.error("Please login again");
+      if (
+        res.message?.includes("Not authorized") ||
+        res.message?.includes("token")
+      ) {
+        tokenManager.clearToken();
+        navigate("/login");
+      }
+    }
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    try {
+      const res = await logoutService();
+      if (!res.success) {
+        console.warn("Logout API failed, but clearing local session");
+      }
+    } catch (error) {
+      console.error("Logout error", error);
+    } finally {
+      tokenManager.clearToken();
+      navigate("/");
+    }
   };
 
   const handleLogin = () => {
@@ -43,15 +75,20 @@ const Profile = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === selectedOrderId
-          ? { ...order, status: "CANCEL_REQUESTED" }
-          : order,
-      ),
-    );
-
+  const handleOk = async () => {
+    if (!cancelReason.trim()) {
+      presentToast.error("Please enter a cancellation reason");
+      return;
+    }
+    setCancelling(true); // 👈 disable button and show spinner
+    const res = await cancelOrder(selectedOrderId, cancelReason);
+    if (res.success) {
+      presentToast.success("Order cancelled successfully");
+      fetchProfile();
+    } else {
+      presentToast.error(res.message || "Failed to cancel order");
+    }
+    setCancelling(false);
     setIsModalOpen(false);
     setCancelReason("");
     setSelectedOrderId(null);
@@ -63,77 +100,132 @@ const Profile = () => {
     setSelectedOrderId(null);
   };
 
-  return (
-    <>
-      <Header />
+  const getInitials = () => {
+    if (!user?.username) return "U";
+    return user.username
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
-      {!user ? (
-        <div className="profile-container">
-          {/* Profile Header */}
-          <div className="profile-header">
-            <p className="profile-avatar">JR</p>
-            <div>
-              <h2>Joel</h2>
-              <p>joel@gmail.com</p>
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-          </div>
+  if (loading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "80vh",
+          flexDirection: "column",
+          textAlign: "center",
+        }}
+      >
+        <img src={myIcon} alt="description" className="my-icon" />
+      </div>
+    );
 
-          {/* Active Orders */}
-          <div className="profile-section">
-            <h3>Active Orders</h3>
-
-            <div className="flash-deals">
-              {orders
-                .filter(
-                  (order) =>
-                    order.status !== "DELIVERED" &&
-                    order.status !== "CANCELLED",
-                )
-                .map((order) => (
-                  <div className="card-wrapper" key={order.id}>
-                    <OrderCard
-                      productname={order.productname}
-                      price={order.price}
-                      image={order.image}
-                      status={order.status}
-                      onCancel={() => openModal(order.id)}
-                    />
-                  </div>
-                ))}
-            </div>
-          </div>
-
-          {/* Order History */}
-          <div className="profile-section">
-            <h3>Order History</h3>
-
-            <div className="flash-deals">
-              {orders
-                .filter((order) => order.status === "DELIVERED")
-                .map((order) => (
-                  <div className="card-wrapper" key={order.id}>
-                    <OrderCard
-                      productname={order.productname}
-                      price={order.price}
-                      image={order.image}
-                      status={order.status}
-                    />
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      ) : (
+  if (!user) {
+    return (
+      <>
+        <Header />
         <div className="login-prompt">
           <h2>You are not logged in</h2>
           <button onClick={handleLogin} className="login-btn">
             Go to Login
           </button>
         </div>
-      )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Header />
+      <div className="profile-container">
+        {/* Profile Header */}
+        <div className="profile-header">
+          <p className="profile-avatar">{getInitials()}</p>
+          <div>
+            <h2>{user.username || "User"}</h2>
+            <p>{user.email}</p>
+            <button
+              className="logout-btn"
+              onClick={handleLogout}
+              disabled={logoutLoading}
+            >
+              {logoutLoading ? "Logging out..." : "Logout"}
+            </button>
+          </div>
+        </div>
+
+        {/* Active Orders */}
+        <div className="profile-section">
+          <h3>Active Orders</h3>
+          <div className="flash-deals">
+            {activeOrders.length === 0 ? (
+              <p>No active orders</p>
+            ) : (
+              activeOrders.map((order) => (
+                <div
+                  className="card-wrapper"
+                  key={order._id}
+                  style={{ display: "flex", flexDirection: "row", gap: "8px" }}
+                >
+                  {order.items.map((orderItem) => (
+                    <OrderCard
+                      key={orderItem._id}
+                      productname={orderItem.productName}
+                      price={orderItem.priceAtPurchase}
+                      image={
+                        orderItem.image || "https://via.placeholder.com/200"
+                      }
+                      status={order.orderStatus}
+                      onCancel={
+                        order.orderStatus === "pending"
+                          ? () => openModal(order._id)
+                          : undefined
+                      }
+                      // optional: disable cancel button while modal open? handled by modal loading
+                    />
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Order History */}
+        <div className="profile-section">
+          <h3>Order History</h3>
+          <div className="flash-deals">
+            {orderHistory.length === 0 ? (
+              <p>No past orders</p>
+            ) : (
+              orderHistory.map((order) => (
+                <div
+                  className="card-wrapper"
+                  key={order._id}
+                  style={{ display: "flex", flexDirection: "row", gap: "8px" }}
+                >
+                  {order.items.map((orderItem) => (
+                    <OrderCard
+                      key={orderItem._id}
+                      productname={orderItem.productName}
+                      price={orderItem.priceAtPurchase}
+                      image={
+                        orderItem.image || "https://via.placeholder.com/200"
+                      }
+                      status={order.orderStatus}
+                    />
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Cancel Modal */}
       <Modal
@@ -144,6 +236,7 @@ const Profile = () => {
         onCancel={handleCancel}
         okText="Confirm Cancel"
         okButtonProps={{ danger: true }}
+        confirmLoading={cancelling} // 👈 this shows spinner and disables OK button
       >
         <textarea
           value={cancelReason}

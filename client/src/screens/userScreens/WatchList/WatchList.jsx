@@ -3,6 +3,7 @@ import ProductCards from "../../../components/productCards/ProductCards";
 import Header from "../../../components/header/userHeader/Header";
 import { getWatchlistService } from "../../../api/userServices/productsServices";
 import ProductListSkeleton from "../../../components/loading/productListSkeletion";
+import { IoIosHeartEmpty } from "react-icons/io";
 
 const WatchList = () => {
   const [products, setProducts] = useState([]);
@@ -11,48 +12,66 @@ const WatchList = () => {
   useEffect(() => {
     const fetchWatchlist = async () => {
       setLoading(true);
-
       const res = await getWatchlistService();
       console.log(res);
       if (res?.success) {
         setProducts(res.data || []);
       }
-
       setLoading(false);
     };
-
     fetchWatchlist();
   }, []);
 
-  return (
-    <>
-      <Header />
-
+  const renderContent = () => {
+    if (loading) {
+      return <ProductListSkeleton />;
+    }
+    if (products.length === 0) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "50vh",
+            textAlign: "center",
+          }}
+        >
+          <IoIosHeartEmpty size={64} color="#ccc" />
+          <h3>Your watchlist is empty</h3>
+          <p>Save items you like to see them here.</p>
+        </div>
+      );
+    }
+    return (
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
           gap: "16px",
-          padding: "100px 20px",
         }}
       >
-        {loading ? (
-          <ProductListSkeleton />
-        ) : (
-          products.map((product) => (
-            <ProductCards
-              key={product._id}
-              productId={product._id}
-              category={product.category}
-              productname={product.productName}
-              actualValue={product.pricing?.discountPrice}
-              discountValue={product.pricing?.basePrice}
-              image={product.colors?.[0]?.images?.[0]?.imageUrl}
-              isWishlisted={true}
-            />
-          ))
-        )}
+        {products.map((product) => (
+          <ProductCards
+            key={product._id}
+            productId={product._id}
+            category={product.category}
+            productname={product.productName}
+            actualValue={product.pricing?.discountPrice}
+            discountValue={product.pricing?.basePrice}
+            image={product.colors?.[0]?.images?.[0]?.imageUrl}
+            isWishlisted={true}
+          />
+        ))}
       </div>
+    );
+  };
+
+  return (
+    <>
+      <Header />
+      <div style={{ padding: "100px 20px" }}>{renderContent()}</div>
     </>
   );
 };

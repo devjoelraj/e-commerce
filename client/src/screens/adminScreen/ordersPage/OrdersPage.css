@@ -69,7 +69,8 @@
   background-color: #375bb5;
 }
 
-.cancel-modal-overlay {
+/* ===== Modal Styles (isolated) ===== */
+.orderpage-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -79,11 +80,82 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
-.cancel-modal {
+.orderpage-modal {
   background: white;
-  padding: 20px;
-  border-radius: 10px;
+  padding: 24px;
+  border-radius: 12px;
   width: 400px;
+  max-width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.orderpage-modal h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  color: #333;
+}
+
+.orderpage-modal textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.orderpage-modal textarea:focus {
+  outline: none;
+  border-color: #4b7bec;
+  box-shadow: 0 0 0 2px rgba(75, 123, 236, 0.2);
+}
+
+.orderpage-modal-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.orderpage-modal-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #4b7bec;
+  color: white;
+}
+
+.orderpage-modal-btn:hover {
+  background-color: #375bb5;
+}
+
+.orderpage-modal-btn.close {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.orderpage-modal-btn.close:hover {
+  background-color: #e0e0e0;
 }

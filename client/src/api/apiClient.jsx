@@ -58,10 +58,18 @@ apiClient.interceptors.response.use(
       },
     );
 
+    // If error is not 401 or request already retried, reject
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
 
+    // 🔥 NEW: Only attempt refresh if the request had an Authorization header (i.e., it was authenticated)
+    if (!originalRequest.headers?.Authorization) {
+      console.log("⏭️ 401 on public endpoint – not attempting refresh");
+      return Promise.reject(error);
+    }
+
+    // Don't refresh if the failed request is itself the refresh endpoint
     if (originalRequest.url === "/auth/refresh-token") {
       console.warn(
         "⚠️ [Refresh] Refresh endpoint itself returned 401 – stopping",
@@ -69,6 +77,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // If already refreshing, queue this request
     if (isRefreshing) {
       console.log("⏳ [Refresh] Already refreshing – queueing request");
       return new Promise((resolve, reject) => {

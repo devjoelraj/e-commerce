@@ -8,6 +8,7 @@ const orderItemSchema = new mongoose.Schema({
   size: String,
   quantity: { type: Number, required: true },
   priceAtPurchase: { type: Number, required: true },
+  image: { type: String },
 });
 
 const orderSchema = new mongoose.Schema({
@@ -34,6 +35,7 @@ const orderSchema = new mongoose.Schema({
     enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
     default: "pending",
   },
+  cancellationReason: { type: String, default: null },
   idempotencyKey: { type: String, unique: true, sparse: true }, // prevent duplicates
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
