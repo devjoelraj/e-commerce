@@ -15,7 +15,7 @@ import {
 import { getoffersService } from "../../api/userServices/userDashboard";
 import presentToast from "../../components/Toast/Toast"; // 👈 add this import
 import "./productLists.css";
-
+import Footer from "../footer/Footer";
 const ProductLists = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -212,6 +212,7 @@ const ProductLists = () => {
           />
         </div>
       )}
+      <Footer />
     </div>
   );
 };

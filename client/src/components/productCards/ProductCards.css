@@ -91,6 +91,7 @@
 @media (max-width: 768px) {
   .product-image {
     height: 180px;
+    margin-top: 10px;
   }
 
   .product-name {

@@ -4,7 +4,7 @@ import Header from "../../../components/header/userHeader/Header";
 import { getWatchlistService } from "../../../api/userServices/productsServices";
 import ProductListSkeleton from "../../../components/loading/productListSkeletion";
 import { IoIosHeartEmpty } from "react-icons/io";
-
+import Footer from "../../../components/footer/Footer";
 const WatchList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +72,7 @@ const WatchList = () => {
     <>
       <Header />
       <div style={{ padding: "100px 20px" }}>{renderContent()}</div>
+      <Footer />
     </>
   );
 };

@@ -17,7 +17,7 @@ import presentToast from "../../../components/Toast/Toast"; // 👈 for notifica
 import AddressPopup from "./AddressPopup";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import myIcon from "../../../assets/loader.svg";
-
+import Footer from "../../../components/footer/Footer";
 const serviceMap = {
   Pants: getPantsProductByIdService,
   Shirts: getShirtsProductByIdService,
@@ -309,7 +309,7 @@ const AddToCart = () => {
           )}
         </div>
       </div>
-
+      <Footer />
       {/* Address Popup */}
       <AddressPopup
         open={showAddressPopup}

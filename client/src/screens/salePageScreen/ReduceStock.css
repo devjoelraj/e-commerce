@@ -1,0 +1,96 @@
+.sale-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sale-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #333;
+  text-align: center;
+}
+
+.sale-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sale-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sale-form-group label {
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+}
+
+.sale-select,
+.sale-input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.sale-select:focus,
+.sale-input:focus {
+  outline: none;
+  border-color: #4b7bec;
+  box-shadow: 0 0 0 2px rgba(75, 123, 236, 0.1);
+}
+
+.sale-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.sale-loading-placeholder {
+  padding: 10px 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+}
+
+.sale-info-message {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  color: #777;
+  font-size: 13px;
+  text-align: center;
+}
+
+.sale-submit-btn {
+  margin-top: 10px;
+  padding: 12px 20px;
+  background-color: #4b7bec;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sale-submit-btn:hover {
+  background-color: #375bb5;
+}
+
+.sale-submit-btn:disabled {
+  background-color: #a0b9f0;
+  cursor: not-allowed;
+}

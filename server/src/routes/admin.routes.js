@@ -43,6 +43,7 @@ import {
   getAllOrders,
   updateOrderStatus,
 } from "../controllers/admin/order.controller.js";
+import { reduceStock } from "../controllers/stock.controller.js";
 
 const router = express.Router();
 
@@ -116,5 +117,7 @@ router.post("/updateProduct", updateProduct);
 
 router.get("/orders", getAllOrders);
 router.put("/orders/:orderId/status", updateOrderStatus);
+
+router.post("/stock/reduce", reduceStock);
 
 export default router;

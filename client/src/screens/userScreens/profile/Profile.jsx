@@ -12,6 +12,7 @@ import {
   logoutService,
 } from "../../../api/userServices/getProfile";
 import myIcon from "../../../assets/loader.svg";
+import Footer from "../../../components/footer/Footer";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -226,7 +227,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
-
+      <Footer />
       {/* Cancel Modal */}
       <Modal
         title="Cancel Order"
