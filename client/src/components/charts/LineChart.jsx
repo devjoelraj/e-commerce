@@ -1,18 +1,16 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
   CartesianGrid,
+  Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
 
-const SalesSummaryChart = React.memo(({ chartData }) => {
-  const data = useMemo(() => chartData, [chartData]);
-
+const SalesSummaryChart = ({ chartData, xKey, lineKeys }) => {
   return (
     <div
       style={{
@@ -22,33 +20,27 @@ const SalesSummaryChart = React.memo(({ chartData }) => {
         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
       }}
     >
-      <h3 style={{ marginBottom: "20px" }}>Sales Summary</h3>
-
+      <h3 style={{ marginBottom: "20px" }}>Sales Trend</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          <XAxis dataKey="weeks" />
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey={xKey} />
           <YAxis />
           <Tooltip />
           <Legend />
-
-          <Line
-            type="monotone"
-            dataKey="pastWeek"
-            stroke="#8a64f0"
-            strokeWidth={2}
-          />
-
-          <Line
-            type="monotone"
-            dataKey="presentWeek"
-            stroke="#64c2f0"
-            strokeWidth={2}
-          />
+          {lineKeys.map((line, idx) => (
+            <Line
+              key={idx}
+              type="monotone"
+              dataKey={line.dataKey}
+              stroke={line.color}
+              name={line.name}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     </div>
   );
-});
+};
 
 export default SalesSummaryChart;

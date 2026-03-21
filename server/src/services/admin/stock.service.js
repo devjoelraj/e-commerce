@@ -1,3 +1,4 @@
+import offlineSaleModel from "../../models/offlineSale.model.js";
 import { getProductModel } from "../../utils/productHelpers.js";
 
 export const reduceStockService = async ({
@@ -6,6 +7,8 @@ export const reduceStockService = async ({
   color,
   size,
   quantity,
+  adminId,
+  sellingPrice,
 }) => {
   const Model = getProductModel(category);
   const product = await Model.findById(productId);
@@ -28,5 +31,22 @@ export const reduceStockService = async ({
   }
 
   await product.save();
+
+  const finalPrice =
+    sellingPrice !== undefined && sellingPrice !== null && sellingPrice > 0
+      ? sellingPrice
+      : product.pricing?.discountPrice || product.pricing?.basePrice;
+
+  await offlineSaleModel.create({
+    productId,
+    category,
+    productName: product.productName,
+    color,
+    size: category === "Accessories" ? null : size,
+    quantity,
+    price: finalPrice,
+    createdBy: adminId,
+  });
+
   return product;
 };

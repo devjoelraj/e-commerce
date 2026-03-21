@@ -13,6 +13,7 @@ const ReduceStock = () => {
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [sellingPrice, setSellingPrice] = useState(""); // new state
   const [loading, setLoading] = useState(false);
   const [fetchingProducts, setFetchingProducts] = useState(false);
 
@@ -23,7 +24,7 @@ const ReduceStock = () => {
     setSelectedProduct(null);
     setColor("");
     setSize("");
-
+    setSellingPrice(""); // reset
     try {
       const res = await getAllProductService();
       if (res.success) {
@@ -54,6 +55,7 @@ const ReduceStock = () => {
     setSelectedProduct(prod);
     setColor("");
     setSize("");
+    setSellingPrice("");
   };
 
   const handleSubmit = async (e) => {
@@ -67,13 +69,22 @@ const ReduceStock = () => {
       return;
     }
     setLoading(true);
-    const res = await reduceStock({
+    const payload = {
       productId: selectedProduct._id,
       category,
       color,
       size: category !== "Accessories" ? size : undefined,
       quantity,
-    });
+    };
+    // Add sellingPrice if provided and valid number
+    if (
+      sellingPrice &&
+      !isNaN(parseFloat(sellingPrice)) &&
+      parseFloat(sellingPrice) > 0
+    ) {
+      payload.sellingPrice = parseFloat(sellingPrice);
+    }
+    const res = await reduceStock(payload);
     if (res.success) {
       presentToast.success("Stock reduced successfully");
       await fetchProducts(category);
@@ -200,7 +211,22 @@ const ReduceStock = () => {
           </div>
         )}
 
-        {/* Submit Button */}
+        {/* Selling Price Input (optional) */}
+        {selectedProduct && (
+          <div className="sale-form-group">
+            <label>Selling Price (optional)</label>
+            <input
+              className="sale-input"
+              type="number"
+              min="0"
+              step="0.01"
+              value={sellingPrice}
+              onChange={(e) => setSellingPrice(e.target.value)}
+              placeholder="Leave empty to use product price"
+            />
+          </div>
+        )}
+
         {selectedProduct && (
           <button type="submit" className="sale-submit-btn" disabled={loading}>
             {loading ? "Processing..." : "Reduce Stock"}
