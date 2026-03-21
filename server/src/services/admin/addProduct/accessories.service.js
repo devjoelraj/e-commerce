@@ -1,4 +1,5 @@
 import Accessories from "../../../models/admin/addProduct/accessories.model.js";
+import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
 
 // ---------- CREATE PRODUCT ----------
 export const createAccessoriesProductService = async ({

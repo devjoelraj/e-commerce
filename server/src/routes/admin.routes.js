@@ -1,7 +1,7 @@
 import express from "express";
 import upload from "../middlewares/multer.js";
 import { protect } from "../middlewares/auth.middleware.js";
-import { authorize } from "../middleware/authorize.js";
+import { authorize } from "../middlewares/authorize.js";
 
 // Slider controllers
 import {

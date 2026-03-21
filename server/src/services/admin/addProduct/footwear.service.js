@@ -1,4 +1,5 @@
 import footWear from "../../../models/admin/addProduct/footWear.model.js";
+import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
 
 export const createShoesProductService = async ({
   productName,

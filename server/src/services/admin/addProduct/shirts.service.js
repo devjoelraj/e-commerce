@@ -1,4 +1,5 @@
 import shirtsModel from "../../../models/admin/addProduct/shirts.model.js";
+import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
 
 export const createShirtsProductService = async ({
   productName,
