@@ -29,6 +29,7 @@ const UserDashboard = lazy(
 import myIcon from "./assets/loader.svg";
 import ReduceStock from "./screens/salePageScreen/SalePage";
 import ImportantLink from "./screens/userScreens/importantLinks";
+import ProtectedAdminOnlyRoute from "./routes/ProtectedAdminOnlyRoute";
 
 function App() {
   return (
@@ -54,15 +55,7 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<UserDashboard />} />
             <Route path="/login" element={<Login />} />
-            {/* <Route path="/product/pants/:id" element={<ProductDetails />} />
-            <Route path="/product/shirts/:id" element={<ProductDetails />} />
-            <Route path="/product/footwear/:id" element={<ProductDetails />} />
-            <Route
-              path="/product/accessories/:id"
-              element={<ProductDetails />}
-            /> */}
             <Route path="/important/:type" element={<ImportantLink />} />
-
             <Route path="/product/:category/:id" element={<ProductDetails />} />
             <Route path="/ProductLists" element={<ProductLists />} />
 
@@ -91,7 +84,16 @@ function App() {
                 </ProtectedUserRoute>
               }
             />
-            <Route path="reduce-stock" element={<ReduceStock />} />
+
+            <Route
+              path="reduce-stock"
+              element={
+                <ProtectedAdminOnlyRoute>
+                  <ReduceStock />
+                </ProtectedAdminOnlyRoute>
+              }
+            />
+
             {/* Protected Admin Routes (using layout) */}
             <Route
               path="/admin"

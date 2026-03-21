@@ -1,5 +1,7 @@
 import express from "express";
 import upload from "../middlewares/multer.js";
+import { protect } from "../middlewares/auth.middleware.js";
+import { authorize } from "../middleware/authorize.js";
 
 // Slider controllers
 import {
@@ -47,77 +49,82 @@ import { reduceStock } from "../controllers/stock.controller.js";
 
 const router = express.Router();
 
-// ========== Slider Routes ==========
-router.post("/sliderUpload", upload.array("file"), createSlider);
+// ========== Public Routes ==========
+// These are accessible without authentication
+router.get("/pants", getPantsProducts);
+router.get("/shirts", getShirtsProducts);
+router.get("/shoes", getShoesProducts);
+router.get("/accessories", getAccessoriesProducts);
+router.get("/allProducts", getAllProducts);
 router.get("/sliderUpload", getSliders);
+
+// ========== Admin‑Only Routes  ==========
+router.use(protect);
+router.use(authorize("admin", "superadmin"));
+// Slider Admin
+router.post("/sliderUpload", upload.array("file"), createSlider);
 router.delete("/sliderUpload/:id", deleteSlider);
 
-// ========== Pants Routes ==========
+// Pants Admin
 router.post(
   "/pantsUpload",
   upload.fields([{ name: "file", maxCount: 50 }]),
   createPantsProduct,
 );
-router.get("/pants", getPantsProducts);
 router.post(
   "/pants/colorVariant/:id",
   upload.array("file"),
   addPantsColorVariant,
 );
 
-// ========== Shirts Routes ==========
+// Shirts Admin
 router.post(
   "/shirtsUpload",
   upload.fields([{ name: "file", maxCount: 50 }]),
   createShirtsProduct,
 );
-router.get("/shirts", getShirtsProducts);
 router.get("/shirts/:id", getShirtsProductById);
-
 router.post(
   "/shirts/colorVariant/:id",
   upload.array("file"),
   addShirtsColorVariant,
 );
 
-// ========== footwear Routes ==========
-
+// Footwear Admin
 router.post(
   "/shoesUpload",
   upload.fields([{ name: "file", maxCount: 50 }]),
   createShoesProduct,
 );
 router.get("/footwear/:id", getFootwearProductById);
-
-router.get("/shoes", getShoesProducts);
 router.post(
   "/shoes/colorVariant/:id",
   upload.array("file"),
   addShoesColorVariant,
 );
 
-// ========== Accessories Routes ==========
+// Accessories Admin
 router.post(
   "/accessoriesUpload",
   upload.fields([{ name: "file", maxCount: 50 }]),
   createAccessoriesProduct,
 );
 router.get("/accessories/:id", getAccessoriesProductById);
-router.get("/accessories", getAccessoriesProducts);
 router.post(
   "/accessories/colorVariant/:id",
   upload.array("file"),
   addAccessoriesColorVariant,
 );
 
-// ========== all product Routes ==========
+// Product Management
 router.post("/deleteProduct", deleteProduct);
-router.get("/allProducts", getAllProducts);
 router.post("/updateProduct", updateProduct);
 
+// Orders Management
 router.get("/orders", getAllOrders);
 router.put("/orders/:orderId/status", updateOrderStatus);
 
+// Stock Reduction
 router.post("/stock/reduce", reduceStock);
 
 export default router;

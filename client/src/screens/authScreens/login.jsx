@@ -195,7 +195,15 @@ const Login = () => {
         tokenManager.setToken(result.accessToken);
         setAuth(result.accessToken);
         presentTost.success("Login successful");
-        navigate("/");
+
+        const user = tokenManager.getUser();
+        if (user?.role === "superadmin") {
+          navigate("/admin/admin-dashboard");
+        } else if (user?.role === "admin") {
+          navigate("/reduce-stock");
+        } else {
+          navigate("/");
+        }
       } else {
         presentTost.error(result?.message || "Login failed");
       }
