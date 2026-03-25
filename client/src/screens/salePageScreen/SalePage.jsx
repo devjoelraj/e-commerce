@@ -1,32 +1,40 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import presentToast from "../../components/Toast/Toast";
 import { getAllProductService } from "../../api/adminServices/allProductService";
 import { reduceStock } from "../../api/adminServices/salePageService";
 import "./ReduceStock.css";
+import { logoutService } from "../../api/userServices/getProfile";
 
 const categories = ["Shirts", "Pants", "Footwear", "Accessories"];
 
 const ReduceStock = () => {
+  const navigate = useNavigate();
+
   const [category, setCategory] = useState("");
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [sellingPrice, setSellingPrice] = useState(""); // new state
+  const [sellingPrice, setSellingPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetchingProducts, setFetchingProducts] = useState(false);
 
+  // 🔁 Fetch Products
   const fetchProducts = async (cat) => {
     if (!cat) return;
+
     setFetchingProducts(true);
     setProducts([]);
     setSelectedProduct(null);
     setColor("");
     setSize("");
-    setSellingPrice(""); // reset
+    setSellingPrice("");
+
     try {
       const res = await getAllProductService();
+
       if (res.success) {
         const filtered = res.data.filter(
           (p) => p.category.toLowerCase() === cat.toLowerCase(),
@@ -43,32 +51,58 @@ const ReduceStock = () => {
     }
   };
 
+  // 🔁 Category change
   const handleCategoryChange = (e) => {
     const cat = e.target.value;
     setCategory(cat);
     if (cat) fetchProducts(cat);
   };
 
+  // 🔁 Product select
   const handleProductSelect = (e) => {
     const id = e.target.value;
     const prod = products.find((p) => p._id === id);
+
     setSelectedProduct(prod);
     setColor("");
     setSize("");
     setSellingPrice("");
   };
 
+  // 🔁 Logout
+  const handleLogout = async () => {
+    const res = await logoutService();
+    try {
+      if (res.success) {
+        presentToast.success("Logged out successfully");
+        navigate("/login");
+      } else {
+        presentToast.error(res.message || "Logout failed");
+      }
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      tokenManager.clearToken();
+      navigate("/");
+    }
+  };
+
+  // 🔁 Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!selectedProduct || !color || !quantity || quantity <= 0) {
       presentToast.error("Please fill all fields");
       return;
     }
+
     if (category !== "Accessories" && !size) {
       presentToast.error("Please select a size");
       return;
     }
+
     setLoading(true);
+
     const payload = {
       productId: selectedProduct._id,
       category,
@@ -76,7 +110,7 @@ const ReduceStock = () => {
       size: category !== "Accessories" ? size : undefined,
       quantity,
     };
-    // Add sellingPrice if provided and valid number
+
     if (
       sellingPrice &&
       !isNaN(parseFloat(sellingPrice)) &&
@@ -84,21 +118,34 @@ const ReduceStock = () => {
     ) {
       payload.sellingPrice = parseFloat(sellingPrice);
     }
-    const res = await reduceStock(payload);
-    if (res.success) {
-      presentToast.success("Stock reduced successfully");
-      await fetchProducts(category);
-    } else {
-      presentToast.error(res.message || "Failed to reduce stock");
+
+    try {
+      const res = await reduceStock(payload);
+
+      if (res.success) {
+        presentToast.success("Stock reduced successfully");
+        await fetchProducts(category);
+      } else {
+        presentToast.error(res.message || "Failed to reduce stock");
+      }
+    } catch (err) {
+      presentToast.error("Something went wrong");
     }
+
     setLoading(false);
   };
 
   return (
     <div className="sale-container">
+      {/* 🔴 Logout */}
+      <button className="logout-btn-sale" onClick={handleLogout}>
+        Logout
+      </button>
+
       <h2 className="sale-title">Reduce Stock (Offline Sale)</h2>
+
       <form onSubmit={handleSubmit} className="sale-form">
-        {/* Category Selection */}
+        {/* Category */}
         <div className="sale-form-group">
           <label>Category</label>
           <select
@@ -116,10 +163,11 @@ const ReduceStock = () => {
           </select>
         </div>
 
-        {/* Product Selection */}
+        {/* Product */}
         {category && (
           <div className="sale-form-group">
             <label>Product</label>
+
             {fetchingProducts ? (
               <div className="sale-loading-placeholder">
                 Loading products...
@@ -140,7 +188,8 @@ const ReduceStock = () => {
                     </option>
                   ))}
                 </select>
-                {products.length === 0 && !fetchingProducts && (
+
+                {products.length === 0 && (
                   <p className="sale-info-message">
                     No products found in this category.
                   </p>
@@ -150,7 +199,7 @@ const ReduceStock = () => {
           </div>
         )}
 
-        {/* Color Selection */}
+        {/* Color */}
         {selectedProduct && (
           <div className="sale-form-group">
             <label>Color</label>
@@ -174,7 +223,7 @@ const ReduceStock = () => {
           </div>
         )}
 
-        {/* Size Selection */}
+        {/* Size */}
         {selectedProduct && category !== "Accessories" && color && (
           <div className="sale-form-group">
             <label>Size</label>
@@ -196,7 +245,7 @@ const ReduceStock = () => {
           </div>
         )}
 
-        {/* Quantity Input */}
+        {/* Quantity */}
         {selectedProduct && (
           <div className="sale-form-group">
             <label>Quantity to deduct</label>
@@ -211,7 +260,7 @@ const ReduceStock = () => {
           </div>
         )}
 
-        {/* Selling Price Input (optional) */}
+        {/* Selling Price */}
         {selectedProduct && (
           <div className="sale-form-group">
             <label>Selling Price (optional)</label>
@@ -227,6 +276,7 @@ const ReduceStock = () => {
           </div>
         )}
 
+        {/* Submit */}
         {selectedProduct && (
           <button type="submit" className="sale-submit-btn" disabled={loading}>
             {loading ? "Processing..." : "Reduce Stock"}

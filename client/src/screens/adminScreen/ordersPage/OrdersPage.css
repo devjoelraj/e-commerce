@@ -159,3 +159,29 @@
 .orderpage-modal-btn.close:hover {
   background-color: #e0e0e0;
 }
+
+.orderspage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pending-tasks-box {
+  background-color: #ff9800;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pending-tasks-label {
+  font-weight: bold;
+}
+
+.pending-tasks-count {
+  font-size: 1.2em;
+  font-weight: bold;
+}

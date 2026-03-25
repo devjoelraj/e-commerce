@@ -89,11 +89,70 @@ function getMonthLabel(year, month) {
 }
 
 export const getMonthlySales = async (monthsCount = 6) => {
-  const endDate = new Date();
-  const startDate = new Date(endDate);
-  startDate.setMonth(endDate.getMonth() - monthsCount + 1);
-  startDate.setDate(1); // first day of that month
-  return getMonthlySalesInRange(startDate, endDate);
+  const today = new Date();
+  const months = [];
+
+  // Generate month ranges (same as before)
+  for (let i = monthsCount - 1; i >= 0; i--) {
+    const monthDate = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const start = new Date(monthDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+    end.setHours(23, 59, 59, 999);
+    const monthLabel = monthDate.toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+    months.push({ start, end, label: monthLabel });
+  }
+
+  const monthlyData = [];
+
+  for (const month of months) {
+    try {
+      // Online orders: count and totalAmount
+      const onlineResult = await Order.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: month.start, $lte: month.end },
+            orderStatus: "delivered",
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            count: { $sum: 1 },
+            total: { $sum: "$totalAmount" },
+          },
+        },
+      ]);
+      const online = onlineResult[0] || { count: 0, total: 0 };
+
+      const offlineResult = await OfflineSale.aggregate([
+        { $match: { createdAt: { $gte: month.start, $lte: month.end } } },
+        {
+          $group: {
+            _id: null,
+            count: { $sum: 1 },
+            total: { $sum: "$price" },
+          },
+        },
+      ]);
+      const offline = offlineResult[0] || { count: 0, total: 0 };
+
+      monthlyData.push({
+        monthLabel: month.label,
+        onlineCount: online.count,
+        onlineAmount: online.total,
+        offlineCount: offline.count,
+        offlineAmount: offline.total,
+      });
+    } catch (err) {
+      throw new Error(`Failed to process month ${month.label}: ${err.message}`);
+    }
+  }
+
+  return monthlyData;
 };
 
 export const getTopProducts = async (limit = 5) => {

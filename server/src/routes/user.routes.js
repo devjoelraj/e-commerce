@@ -3,6 +3,7 @@ import {
   getAllProductsUser,
   getOfferProducts,
   getProductById,
+  getTopProducts,
 } from "../controllers/user/getProduct.controller.js";
 import {
   addToWatchlist,
@@ -35,6 +36,7 @@ const router = express.Router();
 router.get("/product/:id", getProductById);
 router.get("/offers", getOfferProducts);
 router.get("/Allproducts", getAllProductsUser);
+router.get("/top-products", getTopProducts);
 
 router.post("/watchlist/add", protect, addToWatchlist);
 router.post("/watchlist/remove", protect, removeFromWatchlist);

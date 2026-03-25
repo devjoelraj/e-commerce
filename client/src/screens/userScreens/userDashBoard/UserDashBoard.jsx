@@ -3,7 +3,6 @@ import "./UserDashBoard.css";
 import Header from "../../../components/header/userHeader/Header";
 import Footer from "../../../components/footer/Footer";
 import ProductCards from "../../../components/productCards/ProductCards";
-
 import { FaTshirt } from "react-icons/fa";
 import {
   GiArmoredPants,
@@ -11,17 +10,15 @@ import {
   GiFlipFlops,
   GiWatch,
 } from "react-icons/gi";
-
 import HomeCarousel from "./Carousel/Carousel";
 import { useLocation, useNavigate } from "react-router-dom";
-
 import { getoffersService } from "../../../api/userServices/userDashboard";
 import {
   addToWatchlistService,
   removeFromWatchlistService,
   getWatchlistService,
 } from "../../../api/userServices/productsServices";
-
+import { getTopProducts } from "../../../api/adminServices/dashboardService"; // adjust path
 import ProductListSkeleton from "../../../components/loading/productListSkeletion";
 
 const categories = [
@@ -38,26 +35,26 @@ const UserDashBoard = () => {
   const navigate = useNavigate();
 
   const [offersProducts, setOffersProducts] = useState([]);
-
+  const [topProducts, setTopProducts] = useState([]);
   const [watchlistIds, setWatchlistIds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingTop, setLoadingTop] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchTopProducts();
   }, []);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-
       const [offerRes, watchlistRes] = await Promise.all([
-        getoffersService(),
+        getoffersService(4),
         getWatchlistService(),
       ]);
-
+      console.log(offerRes, "offer");
       if (offerRes?.success) {
         setOffersProducts(offerRes.products || []);
-        console.log(offersProducts, "off");
       }
 
       if (watchlistRes?.success) {
@@ -68,6 +65,22 @@ const UserDashBoard = () => {
       console.log("Dashboard error:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTopProducts = async () => {
+    try {
+      const res = await getTopProducts(5);
+      console.log(res, "top");
+      if (res.success) {
+        setTopProducts(res.products);
+      } else {
+        console.warn("Failed to fetch top products:", res.message);
+      }
+    } catch (error) {
+      console.error("Error fetching top products:", error);
+    } finally {
+      setLoadingTop(false);
     }
   };
 
@@ -102,13 +115,11 @@ const UserDashBoard = () => {
     try {
       if (isWishlisted) {
         const res = await removeFromWatchlistService(productId, category);
-        console.log(res, "remove");
         if (res?.success) {
           setWatchlistIds((prev) => prev.filter((id) => id !== productId));
         }
       } else {
         const res = await addToWatchlistService(productId, category);
-        console.log(res, "res");
         if (res?.success) {
           setWatchlistIds((prev) => [...prev, productId]);
         }
@@ -130,15 +141,33 @@ const UserDashBoard = () => {
         <h3>Best selling products</h3>
 
         <div className="flash-deals">
-          <div className="card-wrapper">
-            <ProductCards />
-          </div>
-          <div className="card-wrapper">
-            <ProductCards />
-          </div>
-          <div className="card-wrapper">
-            <ProductCards />
-          </div>
+          {loadingTop ? (
+            <ProductListSkeleton count={5} />
+          ) : (
+            topProducts.map((product) => (
+              <div className="card-wrapper" key={product._id}>
+                <ProductCards
+                  productId={product._id}
+                  category={product.category}
+                  productname={product.productName}
+                  actualValue={product.pricing?.discountPrice}
+                  discountValue={product.pricing?.basePrice}
+                  image={
+                    product.colors?.[0]?.images?.[0]?.imageUrl ||
+                    "https://via.placeholder.com/200"
+                  }
+                  isWishlisted={watchlistIds.includes(product._id)}
+                  onToggleWatchlist={handleToggleWatchlist}
+                  onClick={() =>
+                    navigate(
+                      `/product/${product.category?.toLowerCase()}/${product._id}`,
+                      { state: { product } },
+                    )
+                  }
+                />
+              </div>
+            ))
+          )}
         </div>
 
         <div>
@@ -152,9 +181,7 @@ const UserDashBoard = () => {
 
         <div className="flash-deals">
           {loading ? (
-            <div style={{ display: "flex", gap: 16 }}>
-              <ProductListSkeleton count={4} />
-            </div>
+            <ProductListSkeleton count={4} />
           ) : (
             offersProducts.map((product) => (
               <div className="card-wrapper" key={product._id}>

@@ -15,9 +15,10 @@ export const getSilderService = async () => {
   }
 };
 
-export const getoffersService = async () => {
+export const getoffersService = async (limit = null) => {
   try {
-    const response = await apiClient.get("/user/offers");
+    const url = limit ? `/user/offers?limit=${limit}` : "/user/offers";
+    const response = await apiClient.get(url);
     if (response?.status === 200) {
       return response?.data;
     }

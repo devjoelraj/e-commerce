@@ -17,6 +17,13 @@ const OrdersPage = () => {
     fetchOrders();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 100000);
+    return () => clearInterval(interval);
+  }, []);
+
   const fetchOrders = async () => {
     console.log("Fetching orders...");
     setLoading(true);
@@ -33,7 +40,7 @@ const OrdersPage = () => {
 
   const handleTakeOrder = async (orderId) => {
     console.log("Take order clicked for order:", orderId);
-    const res = await updateOrderStatus(orderId, "shipped"); // directly to shipped
+    const res = await updateOrderStatus(orderId, "shipped");
     if (res.success) {
       presentToast.success("Order marked as out for delivery");
       fetchOrders();
@@ -119,11 +126,22 @@ const OrdersPage = () => {
     printWindow.print();
   };
 
+  // Count pending orders (status "pending")
+  const pendingCount = orders.filter(
+    (order) => order.orderStatus?.toLowerCase() === "pending",
+  ).length;
+
   if (loading) return <div>Loading orders...</div>;
 
   return (
     <div className="orderspage-container">
-      <h2 className="orderspage-title">Orders</h2>
+      <div className="orderspage-header">
+        <h2 className="orderspage-title">Orders</h2>
+        <div className="pending-tasks-box">
+          <span className="pending-tasks-label">Pending Orders</span>
+          <span className="pending-tasks-count">{pendingCount}</span>
+        </div>
+      </div>
 
       <button
         style={{
@@ -155,7 +173,6 @@ const OrdersPage = () => {
               <th className="orderspage-th">Actions</th>
             </tr>
           </thead>
-
           <tbody className="orderspage-tbody">
             {orders.map((order, index) => (
               <tr key={order._id} className="orderspage-row">

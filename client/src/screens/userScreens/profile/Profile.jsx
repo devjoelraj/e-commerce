@@ -81,7 +81,7 @@ const Profile = () => {
       presentToast.error("Please enter a cancellation reason");
       return;
     }
-    setCancelling(true); // 👈 disable button and show spinner
+    setCancelling(true);
     const res = await cancelOrder(selectedOrderId, cancelReason);
     if (res.success) {
       presentToast.success("Order cancelled successfully");

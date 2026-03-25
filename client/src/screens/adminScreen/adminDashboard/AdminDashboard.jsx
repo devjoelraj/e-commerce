@@ -31,17 +31,18 @@ const AdminDashBoardHome = () => {
     fetchData();
   }, []);
 
-  // Prepare data for stacked bar chart (online/offline breakdown)
+  // Prepare data for stacked bar chart (amounts)
   const stackedData = salesData.map((item) => ({
     month: item.monthLabel,
-    online: item.online,
-    offline: item.offline,
+    online: item.onlineAmount,
+    offline: item.offlineAmount,
   }));
 
-  // Prepare data for line chart (total sales = online + offline)
+  // Prepare data for line chart (counts)
   const lineData = salesData.map((item) => ({
     month: item.monthLabel,
-    total: item.online + item.offline,
+    onlineCount: item.onlineCount,
+    offlineCount: item.offlineCount,
   }));
 
   const feedItems = [
@@ -67,7 +68,7 @@ const AdminDashBoardHome = () => {
     },
   ];
 
-  if (loading)
+  if (loading) {
     return (
       <div
         style={{
@@ -75,13 +76,12 @@ const AdminDashBoardHome = () => {
           justifyContent: "center",
           alignItems: "center",
           height: "80vh",
-          flexDirection: "column",
-          textAlign: "center",
         }}
       >
-        <img src={myIcon} alt="description" className="my-icon" />
+        <img src={myIcon} alt="Loading" />
       </div>
     );
+  }
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
@@ -89,17 +89,26 @@ const AdminDashBoardHome = () => {
       <div className="admindashboard-dashboard-row">
         <div className="admindashboard-dashboard-chart">
           <SalesSummaryChart
-            title="Total Sales Trend (Monthly)"
+            title="Number of Orders / Sales (Monthly)"
             chartData={lineData}
             xKey="month"
             lineKeys={[
-              { dataKey: "total", color: "#8a64f0", name: "Total Sales" },
+              {
+                dataKey: "onlineCount",
+                color: "#8a64f0",
+                name: "Online Orders",
+              },
+              {
+                dataKey: "offlineCount",
+                color: "#64c2f0",
+                name: "Offline Sales",
+              },
             ]}
           />
         </div>
         <div className="admindashboard-dashboard-chart">
           <StackedBarChart
-            title="Online vs Offline Sales (Monthly)"
+            title="Sales Value (₹) - Online vs Offline"
             data={stackedData}
             xKey="month"
             stacked={true}
@@ -111,6 +120,7 @@ const AdminDashBoardHome = () => {
         </div>
       </div>
 
+      {/* Top Products Table (unchanged) */}
       <div className="admindashboard-dashboard-card">
         <h3 className="admindashboard-card-title">Top Selling Products</h3>
         <p className="admindashboard-card-subtitle">

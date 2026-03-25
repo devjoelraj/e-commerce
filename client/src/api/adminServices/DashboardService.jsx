@@ -17,7 +17,7 @@ export const getMonthlySalesData = async (months = 6) => {
 
 export const getTopProducts = async (limit = 5) => {
   try {
-    const res = await apiClient.get(`/admin/top-products?limit=${limit}`);
+    const res = await apiClient.get(`/user/top-products?limit=${limit}`);
     return res.data;
   } catch (error) {
     return {
