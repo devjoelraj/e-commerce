@@ -249,6 +249,7 @@ const ProductDetails = () => {
           <p className="product-details-delivery-info">🚚 Free delivery</p>
         </div>
       </div>
+      <h3 style={{ padding: "16px" }}>{product?.description}</h3>
     </>
   );
 };

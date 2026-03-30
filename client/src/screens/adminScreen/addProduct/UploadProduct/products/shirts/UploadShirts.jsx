@@ -44,8 +44,9 @@ const UploadShirts = () => {
       const fetchProducts = async () => {
         try {
           const response = await getShirtsProductsService();
+          console.log(response, "res");
           if (response?.success) {
-            setExistingProducts(response.data || []);
+            setExistingProducts(response.products || []);
           }
         } catch (error) {
           console.error(error);

@@ -34,7 +34,7 @@ const UploadAccessories = () => {
         try {
           const response = await getAccessoriesProductsService();
           if (response?.success) {
-            setExistingProducts(response.data || []);
+            setExistingProducts(response.products || []);
           }
         } catch (error) {
           console.error(error);

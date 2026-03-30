@@ -1,4 +1,5 @@
 import Accessories from "../../../models/admin/addProduct/accessories.model.js";
+import { addToSearchDB } from "../../../utils/addToSearchDB.js";
 import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
 
 // ---------- CREATE PRODUCT ----------
@@ -63,6 +64,7 @@ export const createAccessoriesProductService = async ({
     colors: colorsWithImages,
     createdBy: userId,
   });
+  await addToSearchDB(accessoriesProduct, "Accessories");
 
   return accessoriesProduct;
 };

@@ -18,6 +18,7 @@ const Header = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const navItems = ["Home", "Deals", "All", "Shirts", "Pants"];
 
@@ -35,7 +36,15 @@ const Header = () => {
     footwears: ["shoe", "slipper"],
     Accessories: ["watch", "chain", "ring"],
   };
-
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(
+        `/ProductLists?search=${encodeURIComponent(searchQuery.trim())}`,
+      );
+      setSearchQuery("");
+    }
+  };
   const handleNavigation = (item) => {
     setSidebarOpen(false);
     setOpenSection(null);
@@ -98,15 +107,17 @@ const Header = () => {
           style={{ cursor: "pointer" }}
         />
 
-        <div className="search-wrapper">
+        <form onSubmit={handleSearch} className="search-wrapper">
           <input
             type="text"
             name="search"
             placeholder="Search for products"
             className="search-input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <FaSearch className="search-icon" />
-        </div>
+          <FaSearch className="search-icon" onClick={handleSearch} />
+        </form>
 
         <div className="icons-wrapper">
           <FaHeart

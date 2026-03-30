@@ -42,7 +42,7 @@ const UploadPants = () => {
         const response = await getPantsProductsService();
         console.log(response, "es");
         if (response?.success) {
-          setExistingProducts(response.data);
+          setExistingProducts(response.products);
         }
       } catch (error) {
         console.error(error);

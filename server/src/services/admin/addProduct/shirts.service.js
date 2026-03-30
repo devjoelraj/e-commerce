@@ -1,4 +1,5 @@
 import shirtsModel from "../../../models/admin/addProduct/shirts.model.js";
+import { addToSearchDB } from "../../../utils/addToSearchDB.js";
 import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
 
 export const createShirtsProductService = async ({
@@ -75,7 +76,7 @@ export const createShirtsProductService = async ({
     totalQuantity,
     createdBy: userId,
   });
-
+  await addToSearchDB(shirtsProduct, "shirts");
   return shirtsProduct;
 };
 

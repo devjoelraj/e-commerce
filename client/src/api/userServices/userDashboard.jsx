@@ -74,3 +74,20 @@ export const getAccessoriesProductByIdService = async (id) => {
     };
   }
 };
+
+export const searchProducts = async (query) => {
+  try {
+    const res = await apiClient.get(
+      `/user/search?query=${encodeURIComponent(query)}`,
+    );
+    if (res?.status === 200) {
+      return res.data;
+    }
+    return { success: false, message: "Failed to fetch  products" };
+  } catch (error) {
+    return {
+      success: false,
+      message: "something went wrong try after some time",
+    };
+  }
+};

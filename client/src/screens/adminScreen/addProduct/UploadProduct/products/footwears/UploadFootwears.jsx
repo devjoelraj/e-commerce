@@ -43,7 +43,7 @@ const FootWears = () => {
         try {
           const response = await getFootwearProductsService();
           if (response?.success) {
-            setExistingProducts(response.data || []);
+            setExistingProducts(response.products || []);
           }
         } catch (error) {
           console.error(error);

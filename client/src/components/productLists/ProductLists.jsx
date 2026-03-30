@@ -12,16 +12,21 @@ import {
   getShirtsProductsService,
   getWatchlistService,
 } from "../../api/userServices/productsServices";
-import { getoffersService } from "../../api/userServices/userDashboard";
-import presentToast from "../../components/Toast/Toast"; // 👈 add this import
+import {
+  getoffersService,
+  searchProducts,
+} from "../../api/userServices/userDashboard";
+import presentToast from "../../components/Toast/Toast";
 import "./productLists.css";
 import Footer from "../footer/Footer";
+
 const ProductLists = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const category = location?.state?.category || "";
   const type = location?.state?.type || null;
+  const searchQuery = new URLSearchParams(location.search).get("search");
 
   const [products, setProducts] = useState([]);
   const [watchlistIds, setWatchlistIds] = useState([]);
@@ -33,13 +38,31 @@ const ProductLists = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [category, type]);
+  }, [category, type, searchQuery]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
 
       try {
+        // 🔍 SEARCH BRANCH (NEW) - No changes to existing logic below
+        if (searchQuery) {
+          const res = await searchProducts(searchQuery);
+          console.log(res, "res");
+          if (res.success) {
+            setProducts(res.products || []);
+            setTotal(res.products?.length || 0);
+            setTotalPages(1);
+          } else {
+            setProducts([]);
+            setTotal(0);
+            setTotalPages(0);
+          }
+          setLoading(false);
+          return;
+        }
+
+        // ========== EXISTING CODE (UNCHANGED) ==========
         let productPromise;
 
         if (category === "Pants") {
@@ -130,13 +153,11 @@ const ProductLists = () => {
     };
 
     fetchProducts();
-  }, [category, type, page, limit]);
+  }, [category, type, page, limit, searchQuery]);
 
   const handleProductClick = (product) => {
-    // Determine the category to use for routing
     let productCategory = product.category;
 
-    // If product.category is missing, try to infer from outer category (for Pants/Shirts lists)
     if (!productCategory) {
       if (
         category === "Pants" ||
@@ -144,9 +165,8 @@ const ProductLists = () => {
         category === "Footwear" ||
         category === "Accessories"
       ) {
-        productCategory = category; // use the outer category
+        productCategory = category;
       } else {
-        // For "All" list, we cannot guess; show error
         console.error("Product category missing for product:", product);
         presentToast.error("Product category missing. Cannot navigate.");
         return;
@@ -171,7 +191,19 @@ const ProductLists = () => {
   return (
     <div>
       <Header />
+      {searchQuery && products.length === 0 && !loading && (
+        <h2
+          style={{
+            textAlign: "center",
+            margin: "20px 0",
+            padding: "150px 12px 20px 12px",
+          }}
+        >
+          No results found for "{searchQuery}"
+        </h2>
+      )}
       <div className="product-list-container">
+        {/* Search result heading (optional) */}
         {loading ? (
           <ProductListSkeleton />
         ) : (
@@ -191,7 +223,8 @@ const ProductLists = () => {
         )}
       </div>
 
-      {totalPages > 1 && (
+      {/* Only show pagination for non-search results */}
+      {!searchQuery && totalPages > 1 && (
         <div
           style={{
             display: "flex",

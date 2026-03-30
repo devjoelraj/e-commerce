@@ -30,6 +30,7 @@ import {
   cancelOrder,
   getProfileData,
 } from "../controllers/user/profile.controller.js";
+import { searchProducts } from "../controllers/user/search.controller.js";
 
 const router = express.Router();
 
@@ -57,5 +58,7 @@ router.get("/order", protect, getUserOrders);
 
 router.get("/getprofile", protect, getProfileData);
 router.post("/profile/cancel/:orderId", protect, cancelOrder);
+
+router.get("/search", searchProducts);
 
 export default router;

@@ -18,31 +18,53 @@ const AdminDashBoardHome = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [salesRes, topRes] = await Promise.all([
-        getMonthlySalesData(6),
-        getTopProducts(5),
-      ]);
-      if (salesRes.success) setSalesData(salesRes.data);
-      else setError(salesRes.message || "Failed to load sales data");
-      if (topRes.success) setTopProducts(topRes.products);
-      else console.error(topRes.message);
-      setLoading(false);
+      try {
+        const [salesRes, topRes] = await Promise.all([
+          getMonthlySalesData(6),
+          getTopProducts(5),
+        ]);
+
+        if (salesRes.success) {
+          setSalesData(salesRes.data || []);
+        } else {
+          setError(salesRes.message || "Failed to load sales data");
+        }
+
+        if (topRes.success) {
+          // Ensure each product has valid values
+          const validProducts = (topRes.products || []).map((product) => ({
+            ...product,
+            averagePrice: product.averagePrice ?? 0,
+            totalQuantity: product.totalQuantity ?? 0,
+            productName: product.productName || "Unknown Product",
+          }));
+          setTopProducts(validProducts);
+        } else {
+          console.error(topRes.message);
+          setTopProducts([]);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);
 
   // Prepare data for stacked bar chart (amounts)
   const stackedData = salesData.map((item) => ({
-    month: item.monthLabel,
-    online: item.onlineAmount,
-    offline: item.offlineAmount,
+    month: item.monthLabel || "Unknown",
+    online: item.onlineAmount ?? 0,
+    offline: item.offlineAmount ?? 0,
   }));
 
   // Prepare data for line chart (counts)
   const lineData = salesData.map((item) => ({
-    month: item.monthLabel,
-    onlineCount: item.onlineCount,
-    offlineCount: item.offlineCount,
+    month: item.monthLabel || "Unknown",
+    onlineCount: item.onlineCount ?? 0,
+    offlineCount: item.offlineCount ?? 0,
   }));
 
   const feedItems = [
@@ -82,6 +104,7 @@ const AdminDashBoardHome = () => {
       </div>
     );
   }
+
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
@@ -120,7 +143,7 @@ const AdminDashBoardHome = () => {
         </div>
       </div>
 
-      {/* Top Products Table (unchanged) */}
+      {/* Top Products Table */}
       <div className="admindashboard-dashboard-card">
         <h3 className="admindashboard-card-title">Top Selling Products</h3>
         <p className="admindashboard-card-subtitle">
@@ -129,15 +152,19 @@ const AdminDashBoardHome = () => {
         <div className="admindashboard-table-header">
           <span>Product</span>
           <span>Units Sold</span>
-          <span>Avg Price</span>
         </div>
-        {topProducts.map((item, index) => (
-          <div className="admindashboard-table-row" key={index}>
-            <span>{item.productName}</span>
-            <span>{item.totalQuantity}</span>
-            <span>₹{item.averagePrice.toFixed(2)}</span>
+        {topProducts.length === 0 ? (
+          <div className="admindashboard-table-row">
+            <span colSpan="3">No products found</span>
           </div>
-        ))}
+        ) : (
+          topProducts.map((item, index) => (
+            <div className="admindashboard-table-row" key={index}>
+              <span>{item.productName}</span>
+              <span>{item.totalQuantity}</span>
+            </div>
+          ))
+        )}
       </div>
     </>
   );
