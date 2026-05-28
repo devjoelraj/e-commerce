@@ -10,7 +10,7 @@ import {
   GiFlipFlops,
   GiWatch,
 } from "react-icons/gi";
-import HomeCarousel from "./Carousel/Carousel";
+import HomeCarousel from "./carousel/Carousel";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getoffersService } from "../../../api/userServices/userDashboard";
 import {
