@@ -4,13 +4,13 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cron from "node-cron";
-import { frontendUrl, nodeEnv } from "./src/config/env.config.js";
-import { errorHandler, notFound } from "./src/middlewares/errorMiddleware.js";
-import { globalLimiter } from "./src/middlewares/rateLimit.middleware.js";
-import authRoutes from "./src/routes/auth.routes.js";
-import adminRouter from "./src/routes/admin.routes.js";
-import userRouter from "./src/routes/user.routes.js";
-import { clearExpiredCartItems } from "./src/cron/cartExpiry.js";
+import { frontendUrl, nodeEnv } from "./config/env.config.js";
+import { errorHandler, notFound } from "./middlewares/errorMiddleware.js";
+import { globalLimiter } from "./middlewares/rateLimit.middleware.js";
+import authRoutes from "./routes/auth.routes.js";
+import adminRouter from "./routes/admin.routes.js";
+import userRouter from "./routes/user.routes.js";
+import { clearExpiredCartItems } from "./cron/cartExpiry.js";
 
 const app = express();
 

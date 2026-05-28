@@ -1,6 +1,6 @@
 import app from "./app.js";
-import { connectDB } from "./src/config/db.config.js";
-import { port } from "./src/config/env.config.js";
+import { connectDB } from "./config/db.config.js";
+import { port } from "./config/env.config.js";
 
 connectDB();
 
