@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./UserDashBoard.css";
+import "./userDashBoard.css";
 import Header from "../../../components/header/userHeader/Header";
 import Footer from "../../../components/footer/Footer";
 import ProductCards from "../../../components/productCards/ProductCards";
