@@ -18,7 +18,7 @@ import {
   removeFromWatchlistService,
   getWatchlistService,
 } from "../../../api/userServices/productsServices";
-import { getTopProducts } from "../../../api/adminServices/dashboardService"; // adjust path
+import { getTopProducts } from "../../../api/adminServices/DashboardService";
 import ProductListSkeleton from "../../../components/loading/productListSkeletion";
 
 const categories = [
