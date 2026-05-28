@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaTasks, FaServer, FaShoppingCart, FaUserPlus } from "react-icons/fa";
-import SalesSummaryChart from "../../../components/charts/lineChart";
+import SalesSummaryChart from "../../../components/charts/LineChart";
 import StackedBarChart from "../../../components/charts/Stacked";
 import {
   getMonthlySalesData,
