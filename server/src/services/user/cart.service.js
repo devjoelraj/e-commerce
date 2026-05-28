@@ -1,6 +1,6 @@
 import Cart from "../../models/cart.model.js";
 import Pants from "../../models/admin/addProduct/pants.model.js";
-import Footwear from "../../models/admin/addProduct/footwear.model.js";
+import Footwear from "../../models/admin/addProduct/footWear.model.js";
 import Accessories from "../../models/admin/addProduct/accessories.model.js";
 import Shirts from "../../models/admin/addProduct/shirts.model.js";
 
