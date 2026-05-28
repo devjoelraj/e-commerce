@@ -2,7 +2,7 @@ import axios from "axios";
 import { tokenManager } from "./tokenManager";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://e-commerce-afim.onrender.com",
   withCredentials: true,
 });
 
@@ -98,7 +98,10 @@ apiClient.interceptors.response.use(
       const refreshResponse = await axios.post(
         "/auth/refresh-token",
         {},
-        { withCredentials: true, baseURL: "http://localhost:5000" },
+        {
+          withCredentials: true,
+          baseURL: "https://e-commerce-afim.onrender.com",
+        },
       );
       console.log("🔄 [Refresh] Response:", refreshResponse.data);
 
