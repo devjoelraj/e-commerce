@@ -44,9 +44,9 @@ export const addToCartService = async (data) => {
     if (res?.status === 200) {
       return res?.data;
     }
-    return { success: false, message: "Failed to add item to cart" };
+    return { success: false, message: "please login to add item to cart" };
   } catch (err) {
-    return { success: false, message: "Failed to add item to cart" };
+    return { success: false, message: "please login to add item to cart" };
   }
 };
 

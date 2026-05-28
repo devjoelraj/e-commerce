@@ -48,7 +48,7 @@ const WatchList = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+          gridTemplateColumns: "repeat(3,1fr)",
           gap: "16px",
         }}
       >

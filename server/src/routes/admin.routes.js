@@ -62,6 +62,11 @@ router.get("/accessories", getAccessoriesProducts);
 router.get("/allProducts", getAllProducts);
 router.get("/sliderUpload", getSliders);
 
+//====
+router.get("/shirts/:id", getShirtsProductById);
+router.get("/footwear/:id", getFootwearProductById);
+router.get("/accessories/:id", getAccessoriesProductById);
+
 // ========== Admin‑Only Routes  ==========
 router.use(protect);
 router.use(authorize("admin", "superadmin"));
@@ -87,7 +92,6 @@ router.post(
   upload.fields([{ name: "file", maxCount: 50 }]),
   createShirtsProduct,
 );
-router.get("/shirts/:id", getShirtsProductById);
 router.post(
   "/shirts/colorVariant/:id",
   upload.array("file"),
@@ -100,7 +104,6 @@ router.post(
   upload.fields([{ name: "file", maxCount: 50 }]),
   createShoesProduct,
 );
-router.get("/footwear/:id", getFootwearProductById);
 router.post(
   "/shoes/colorVariant/:id",
   upload.array("file"),
@@ -113,7 +116,6 @@ router.post(
   upload.fields([{ name: "file", maxCount: 50 }]),
   createAccessoriesProduct,
 );
-router.get("/accessories/:id", getAccessoriesProductById);
 router.post(
   "/accessories/colorVariant/:id",
   upload.array("file"),

@@ -38,10 +38,11 @@ const AddToCart = () => {
     try {
       setLoading(true);
       const res = await getCartService();
+      console.log(res, "cart");
       if (res.success) {
         const items = res.data.items || [];
         setCartItems(items);
-
+        console.log(cartItems, "cartitems");
         const productPromises = items.map(async (item) => {
           const service = serviceMap[item.category];
           if (!service) return null;

@@ -5,7 +5,7 @@ import { getAllProductService } from "../../api/adminServices/allProductService"
 import { reduceStock } from "../../api/adminServices/salePageService";
 import "./ReduceStock.css";
 import { logoutService } from "../../api/userServices/getProfile";
-
+import Header from "../../components/header/userHeader/Header";
 const categories = ["Shirts", "Pants", "Footwear", "Accessories"];
 
 const ReduceStock = () => {
@@ -136,154 +136,162 @@ const ReduceStock = () => {
   };
 
   return (
-    <div className="sale-container">
-      {/* 🔴 Logout */}
-      <button className="logout-btn-sale" onClick={handleLogout}>
-        Logout
-      </button>
+    <>
+      {" "}
+      <Header />
+      <div className="sale-container">
+        {/* 🔴 Logout */}
+        <button className="logout-btn-sale" onClick={handleLogout}>
+          Logout
+        </button>
 
-      <h2 className="sale-title">Reduce Stock (Offline Sale)</h2>
+        <h2 className="sale-title">Reduce Stock (Offline Sale)</h2>
 
-      <form onSubmit={handleSubmit} className="sale-form">
-        {/* Category */}
-        <div className="sale-form-group">
-          <label>Category</label>
-          <select
-            className="sale-select"
-            value={category}
-            onChange={handleCategoryChange}
-            required
-          >
-            <option value="">Select Category</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Product */}
-        {category && (
+        <form onSubmit={handleSubmit} className="sale-form">
+          {/* Category */}
           <div className="sale-form-group">
-            <label>Product</label>
-
-            {fetchingProducts ? (
-              <div className="sale-loading-placeholder">
-                Loading products...
-              </div>
-            ) : (
-              <>
-                <select
-                  className="sale-select"
-                  value={selectedProduct?._id || ""}
-                  onChange={handleProductSelect}
-                  required
-                  disabled={products.length === 0}
-                >
-                  <option value="">Select product</option>
-                  {products.map((p) => (
-                    <option key={p._id} value={p._id}>
-                      {p.productName}
-                    </option>
-                  ))}
-                </select>
-
-                {products.length === 0 && (
-                  <p className="sale-info-message">
-                    No products found in this category.
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Color */}
-        {selectedProduct && (
-          <div className="sale-form-group">
-            <label>Color</label>
+            <label>Category</label>
             <select
               className="sale-select"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+              value={category}
+              onChange={handleCategoryChange}
               required
             >
-              <option value="">Select color</option>
-              {selectedProduct.colors.map((c) => (
-                <option key={c.name} value={c.name}>
-                  {c.name} (stock:{" "}
-                  {category === "Accessories"
-                    ? c.qty
-                    : c.sizes?.reduce((sum, s) => sum + s.qty, 0) || 0}
-                  )
+              <option value="">Select Category</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
                 </option>
               ))}
             </select>
           </div>
-        )}
 
-        {/* Size */}
-        {selectedProduct && category !== "Accessories" && color && (
-          <div className="sale-form-group">
-            <label>Size</label>
-            <select
-              className="sale-select"
-              value={size}
-              onChange={(e) => setSize(e.target.value)}
-              required
-            >
-              <option value="">Select size</option>
-              {selectedProduct.colors
-                .find((c) => c.name === color)
-                ?.sizes?.map((s) => (
-                  <option key={s.size} value={s.size}>
-                    {s.size} (stock: {s.qty})
+          {/* Product */}
+          {category && (
+            <div className="sale-form-group">
+              <label>Product</label>
+
+              {fetchingProducts ? (
+                <div className="sale-loading-placeholder">
+                  Loading products...
+                </div>
+              ) : (
+                <>
+                  <select
+                    className="sale-select"
+                    value={selectedProduct?._id || ""}
+                    onChange={handleProductSelect}
+                    required
+                    disabled={products.length === 0}
+                  >
+                    <option value="">Select product</option>
+                    {products.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {p.productName}
+                      </option>
+                    ))}
+                  </select>
+
+                  {products.length === 0 && (
+                    <p className="sale-info-message">
+                      No products found in this category.
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Color */}
+          {selectedProduct && (
+            <div className="sale-form-group">
+              <label>Color</label>
+              <select
+                className="sale-select"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                required
+              >
+                <option value="">Select color</option>
+                {selectedProduct.colors.map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name} (stock:{" "}
+                    {category === "Accessories"
+                      ? c.qty
+                      : c.sizes?.reduce((sum, s) => sum + s.qty, 0) || 0}
+                    )
                   </option>
                 ))}
-            </select>
-          </div>
-        )}
+              </select>
+            </div>
+          )}
 
-        {/* Quantity */}
-        {selectedProduct && (
-          <div className="sale-form-group">
-            <label>Quantity to deduct</label>
-            <input
-              className="sale-input"
-              type="number"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-              required
-            />
-          </div>
-        )}
+          {/* Size */}
+          {selectedProduct && category !== "Accessories" && color && (
+            <div className="sale-form-group">
+              <label>Size</label>
+              <select
+                className="sale-select"
+                value={size}
+                onChange={(e) => setSize(e.target.value)}
+                required
+              >
+                <option value="">Select size</option>
+                {selectedProduct.colors
+                  .find((c) => c.name === color)
+                  ?.sizes?.map((s) => (
+                    <option key={s.size} value={s.size}>
+                      {s.size} (stock: {s.qty})
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
 
-        {/* Selling Price */}
-        {selectedProduct && (
-          <div className="sale-form-group">
-            <label>Selling Price (optional)</label>
-            <input
-              className="sale-input"
-              type="number"
-              min="0"
-              step="0.01"
-              value={sellingPrice}
-              onChange={(e) => setSellingPrice(e.target.value)}
-              placeholder="Leave empty to use product price"
-            />
-          </div>
-        )}
+          {/* Quantity */}
+          {selectedProduct && (
+            <div className="sale-form-group">
+              <label>Quantity to deduct</label>
+              <input
+                className="sale-input"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                required
+              />
+            </div>
+          )}
 
-        {/* Submit */}
-        {selectedProduct && (
-          <button type="submit" className="sale-submit-btn" disabled={loading}>
-            {loading ? "Processing..." : "Reduce Stock"}
-          </button>
-        )}
-      </form>
-    </div>
+          {/* Selling Price */}
+          {selectedProduct && (
+            <div className="sale-form-group">
+              <label>Selling Price (optional)</label>
+              <input
+                className="sale-input"
+                type="number"
+                min="0"
+                step="0.01"
+                value={sellingPrice}
+                onChange={(e) => setSellingPrice(e.target.value)}
+                placeholder="Leave empty to use product price"
+              />
+            </div>
+          )}
+
+          {/* Submit */}
+          {selectedProduct && (
+            <button
+              type="submit"
+              className="sale-submit-btn"
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Reduce Stock"}
+            </button>
+          )}
+        </form>
+      </div>
+    </>
   );
 };
 
