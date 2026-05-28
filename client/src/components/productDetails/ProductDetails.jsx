@@ -1,154 +1,255 @@
-import React, { useState } from "react";
-import { FaHeart, FaStar } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import "./ProductDetails.css";
 import Header from "../header/userHeader/Header";
 
-const ProductDetails = () => {
-  const data = [
-    {
-      id: 1,
-      name: "Classic Cotton Shirt",
-      price: 109,
-      category: "men",
-      images: [
-        "https://picsum.photos/id/1011/600/400",
-        "https://picsum.photos/id/1012/600/400",
-        "https://picsum.photos/id/1013/600/400",
-        "https://picsum.photos/id/1014/600/400",
-      ],
-      colors: [
-        "https://picsum.photos/seed/red/50",
-        "https://picsum.photos/seed/blue/50",
-        "https://picsum.photos/seed/black/50",
-      ],
-    },
-  ];
+import { getPantsProductByIdService } from "../../api/userServices/productsServices";
+import {
+  getAccessoriesProductByIdService,
+  getFootwearProductByIdService,
+  getShirtsProductByIdService,
+} from "../../api/userServices/userDashboard";
 
-  const product = data[0];
-  const [selectedImg, setSelectedImg] = useState(data[0].images[0]);
+import presentToast from "../Toast/Toast";
+import DetailSkeleton from "../loading/detailSkeletion";
+import { addToCartService } from "../../api/userServices/addToCartService";
+
+const ProductDetails = () => {
+  const { category, id } = useParams(); // 👈 now category is captured
+  const location = useLocation();
+
+  const [product, setProduct] = useState(location.state?.product || null);
+  const [loading, setLoading] = useState(!product);
+
+  const [selectedImg, setSelectedImg] = useState("");
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedTab, setSelectedTab] = useState("details");
+
+  const [imageLoading, setImageLoading] = useState(true);
+  const [cartLoading, setCartLoading] = useState(false);
+
+  /* 🔁 SERVICE MAP */
+  const serviceMap = {
+    pants: getPantsProductByIdService,
+    shirts: getShirtsProductByIdService,
+    footwear: getFootwearProductByIdService,
+    accessories: getAccessoriesProductByIdService,
+  };
+
+  /* 🔄 FETCH PRODUCT */
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        if (!id || !category || !serviceMap[category]) return;
+
+        const response = await serviceMap[category](id);
+        console.log("📦 Product API response:", response);
+
+        if (response?.success && response.data) {
+          // Add category to product object (useful later)
+          const productWithCategory = {
+            ...response.data,
+            category: category,
+          };
+          setProduct(productWithCategory);
+
+          const firstImage =
+            response.data.colors?.[0]?.images?.[0]?.imageUrl || "";
+          setSelectedImg(firstImage);
+        }
+      } catch (error) {
+        console.error("❌ Fetch product error:", error);
+        presentToast.error("Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!product) {
+      fetchProduct();
+    } else {
+      const firstImage = product.colors?.[0]?.images?.[0]?.imageUrl || "";
+      setSelectedImg(firstImage);
+      setLoading(false);
+    }
+  }, [id, category, product]);
+
+  /* 🎨 IMAGE CHANGE ON COLOR CHANGE */
+  useEffect(() => {
+    if (!product) return;
+
+    const color = product.colors?.[selectedColorIndex];
+    const newImage = color?.images?.[0]?.imageUrl || "";
+
+    setImageLoading(true);
+    setSelectedImg(newImage);
+    setSelectedSize(null); // reset size
+  }, [selectedColorIndex, product]);
+
+  /* 🛒 ADD TO CART */
+  const handleAddToCart = async () => {
+    if (cartLoading) return;
+
+    const selectedColor = product?.colors?.[selectedColorIndex];
+
+    console.log("🛒 ADD TO CART CLICKED");
+    console.log("🌐 URL category:", category);
+    console.log("📦 Product:", product);
+    console.log("🎨 Selected Color:", selectedColor);
+    console.log("📏 Selected Size:", selectedSize);
+
+    if (!product?._id) {
+      return presentToast.error("Product not found");
+    }
+
+    if (!selectedColor) {
+      return presentToast.error("Please select color");
+    }
+
+    if (category !== "accessories" && !selectedSize) {
+      return presentToast.error("Please select size");
+    }
+
+    // Format category (capitalize first letter)
+    const formattedCategory =
+      category.charAt(0).toUpperCase() + category.slice(1);
+
+    const payload = {
+      productId: product._id,
+      category: formattedCategory,
+      color: selectedColor.name,
+      size: selectedSize,
+      quantity: 1,
+    };
+
+    console.log("📦 Final Payload:", payload);
+
+    try {
+      setCartLoading(true);
+      const res = await addToCartService(payload);
+      if (res?.success) {
+        presentToast.success("Added to cart 🛒");
+      } else {
+        presentToast.error(res.message || "Failed to add");
+      }
+    } catch (error) {
+      presentToast.error(
+        error.response?.data?.message || "Something went wrong",
+      );
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
+  /* 🧱 LOADING STATES */
+  if (loading) return <DetailSkeleton />;
+  if (!product) return <div>Product not found</div>;
+
   return (
     <>
       <Header />
       <div className="product-details-container">
+        {/* LEFT */}
         <div className="product-details-images-section">
-          <img
-            src={selectedImg}
-            alt="Main"
-            className="product-details-main-image"
-          />
+          <div className="product-details-main-image-wrapper">
+            {imageLoading && (
+              <div className="product-image-loader">
+                <div className="product-image-skeleton"></div>
+              </div>
+            )}
+            <img
+              src={selectedImg}
+              alt="Main"
+              className={`product-details-main-image ${
+                imageLoading ? "hidden-image" : "show-image"
+              }`}
+              onLoad={() => setImageLoading(false)}
+            />
+          </div>
           <div className="product-details-thumbnail-row">
-            {product.images?.slice(1)?.map((img, index) => (
+            {product.colors?.[selectedColorIndex]?.images?.map((img, index) => (
               <img
                 key={index}
-                src={img}
-                alt={`thumb-${index}`}
+                src={img.imageUrl}
+                alt="thumbnail"
                 className="product-details-thumbnail"
                 onClick={() => {
-                  setSelectedImg(img);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  setImageLoading(true);
+                  setSelectedImg(img.imageUrl);
                 }}
               />
             ))}
           </div>
         </div>
 
+        {/* RIGHT */}
         <div className="product-details-section">
-          <p className="product-details-name">{product.name}</p>
+          <p className="product-details-name">{product.productName}</p>
 
-          <p className="product-details-rating">
-            <FaStar />
-            <FaStar />
-            <FaStar />
-            <FaStar />
-            <FaStar />
-          </p>
+          <h1 className="product-details-price">
+            ₹
+            {product.pricing?.discountPrice ||
+              product.pricing?.basePrice ||
+              "N/A"}
+          </h1>
 
-          <h1 className="product-details-price">Rate: ${product.price}</h1>
-
+          {/* COLOR */}
           <p className="product-details-label">Color</p>
           <div className="product-details-color-options">
-            {product.colors?.map((colorImg, index) => (
-              <img
+            {product.colors?.map((color, index) => (
+              <div
                 key={index}
-                src={colorImg}
-                alt={`color-${index}`}
-                className="product-details-color-circle"
+                className={`product-details-color-circle ${
+                  selectedColorIndex === index ? "selected" : ""
+                }`}
+                style={{ backgroundColor: color.hex }}
+                onClick={() => setSelectedColorIndex(index)}
               />
             ))}
           </div>
 
-          <p className="product-details-label">Size</p>
-          <div className="product-details-size-buttons">
-            {["XS", "S", "M", "L", "XL"].map((size) => (
-              <button
-                key={size}
-                className={`product-details-size-btn ${
-                  selectedSize === size ? "selected" : ""
-                }`}
-                onClick={() => setSelectedSize(size)}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
+          {/* SIZE */}
+          {category !== "accessories" && (
+            <>
+              <p className="product-details-label">Size</p>
+              <div className="product-details-size-buttons">
+                {product.colors?.[selectedColorIndex]?.sizes
+                  ?.filter((s) => s.qty > 0)
+                  ?.map((sizeObj) => (
+                    <button
+                      key={sizeObj.size}
+                      className={`product-details-size-btn ${
+                        selectedSize === sizeObj.size ? "selected" : ""
+                      }`}
+                      onClick={() => setSelectedSize(sizeObj.size)}
+                    >
+                      {sizeObj.size}
+                    </button>
+                  ))}
+              </div>
+            </>
+          )}
 
+          {/* ACTION */}
           <div className="product-details-actions">
-            <button className="product-details-add-to-cart">Add to cart</button>
-            <FaHeart className="product-details-wishlist-icon" />
+            <button
+              className="product-details-add-to-cart"
+              onClick={handleAddToCart}
+              disabled={cartLoading}
+              style={{
+                opacity: cartLoading ? 0.6 : 1,
+                cursor: cartLoading ? "not-allowed" : "pointer",
+              }}
+            >
+              {cartLoading ? "Adding..." : "Add to cart"}
+            </button>
           </div>
 
           <p className="product-details-delivery-info">🚚 Free delivery</p>
         </div>
       </div>
-
-      <div className="product-tabs-container">
-        <div className="product-tabs-header">
-          <p
-            className={`product-tab-button ${
-              selectedTab === "details" ? "active-tab" : ""
-            }`}
-            onClick={() => setSelectedTab("details")}
-          >
-            Details
-          </p>
-
-          <p
-            className={`product-tab-button ${
-              selectedTab === "reviews" ? "active-tab" : ""
-            }`}
-            onClick={() => setSelectedTab("reviews")}
-          >
-            Reviews
-          </p>
-        </div>
-
-        <div className="product-tab-content">
-          {selectedTab === "details" ? (
-            <div className="product-details-content">
-              <p>
-                <strong>Material:</strong> 100% Premium Cotton
-              </p>
-              <p>
-                <strong>Fit:</strong> Regular Fit
-              </p>
-              <p>
-                <strong>Care:</strong> Machine wash cold, tumble dry low
-              </p>
-              <p>
-                <strong>Description:</strong> This classic cotton shirt is
-                perfect for everyday wear. It’s soft, breathable, and designed
-                to keep you comfortable while looking sharp.
-              </p>
-            </div>
-          ) : (
-            <div className="product-reviews-content">
-              <p>No reviews yet. Be the first to leave one!</p>
-            </div>
-          )}
-        </div>
-      </div>
+      <h3 style={{ padding: "16px" }}>{product?.description}</h3>
     </>
   );
 };

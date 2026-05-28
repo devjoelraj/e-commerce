@@ -1,122 +1,119 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./OrdersPage.css";
 import presentToast from "../../../components/Toast/Toast";
+import {
+  getAllOrders,
+  updateOrderStatus,
+} from "../../../api/adminServices/orderService";
 
 const OrdersPage = () => {
-  const [orders, setOrders] = useState([
-    {
-      id: "#78522135",
-      product: "Smart Watch",
-      qty: 1,
-      address: "351 Sherwood Forest Drive",
-      date: "20/03/2021",
-      price: "$376.00",
-      status: "pending",
-    },
-    {
-      id: "#78522136",
-      product: "Headphones",
-      qty: 2,
-      address: "6391 Elgin St. Celina",
-      date: "21/03/2021",
-      price: "$276.00",
-      status: "pending",
-    },
-    {
-      id: "#78522137",
-      qty: 2,
-      product: "Iphone Pro",
-      address: "8502 Preston Rd. Inglewood",
-      date: "01/04/2021",
-      price: "$300.00",
-      status: "pending",
-    },
-    {
-      id: "#78522138",
-      product: "Nike Air Max",
-      qty: 2,
-      address: "3891 Ranchview Dr. Richardson",
-      date: "02/04/2021",
-      price: "$100.00",
-      status: "pending",
-    },
-    {
-      id: "#78522139",
-      product: "Apple Watch",
-      qty: 2,
-      address: "4140 Parker Rd. Allentown",
-      date: "07/04/2021",
-      price: "$300.00",
-      status: "pending",
-    },
-  ]);
-
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [emailMessage, setEmailMessage] = useState("");
 
-  const handleTakeOrder = (orderId) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId ? { ...order, status: "packing" } : order,
-      ),
-    );
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 100000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchOrders = async () => {
+    console.log("Fetching orders...");
+    setLoading(true);
+    const res = await getAllOrders();
+    if (res.success) {
+      console.log("Orders fetched:", res.orders);
+      setOrders(res.orders || []);
+    } else {
+      console.error("Failed to fetch orders:", res.message);
+      presentToast.error(res.message || "Failed to load orders");
+    }
+    setLoading(false);
+  };
+
+  const handleTakeOrder = async (orderId) => {
+    console.log("Take order clicked for order:", orderId);
+    const res = await updateOrderStatus(orderId, "shipped");
+    if (res.success) {
+      presentToast.success("Order marked as out for delivery");
+      fetchOrders();
+    } else {
+      presentToast.error(res.message || "Failed to take order");
+    }
   };
 
   const openCancelModal = (order) => {
+    console.log("Opening cancel modal for order:", order);
     setSelectedOrder(order);
     setShowCancelModal(true);
   };
 
-  const confirmCancelOrder = () => {
+  const confirmCancelOrder = async () => {
+    console.log("Confirm cancel for order:", selectedOrder?._id);
     if (!emailMessage.trim()) {
+      console.warn("Email message empty");
       presentToast.error("Please write email message");
       return;
     }
 
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === selectedOrder.id
-          ? { ...order, status: "cancelled" }
-          : order,
-      ),
+    const res = await updateOrderStatus(
+      selectedOrder._id,
+      "cancelled",
+      emailMessage,
     );
-
-    presentToast.success("Order cancelled and email sent");
+    if (res.success) {
+      console.log("Order cancelled successfully:", selectedOrder._id);
+      presentToast.success("Order cancelled and email sent");
+      fetchOrders();
+    } else {
+      console.error("Failed to cancel order:", res.message);
+      presentToast.error(res.message || "Failed to cancel order");
+    }
 
     setShowCancelModal(false);
     setEmailMessage("");
     setSelectedOrder(null);
   };
 
-  // ✅ PRINT ONLY TAKEN ORDERS
   const handlePrintTakenOrders = () => {
-    const takenOrders = orders.filter((order) => order.status === "packing");
+    const takenOrders = orders.filter(
+      (order) => order.orderStatus?.toLowerCase() === "shipped",
+    );
 
     if (takenOrders.length === 0) {
-      presentToast.success("No taken orders to print");
+      presentToast.success("No out‑for‑delivery orders to print");
       return;
     }
 
     const printWindow = window.open("", "_blank");
-
     printWindow.document.write(`
       <html>
         <head>
-          <title>Taken Orders</title>
+          <title>Out for Delivery Orders</title>
         </head>
         <body>
-          <h2>Taken Orders</h2>
+          <h2>Out for Delivery Orders</h2>
           ${takenOrders
             .map(
               (order) => `
                 <div style="margin-bottom:20px;">
-                  <p><strong>Order ID:</strong> ${order.id}</p>
-                  <p><strong>Product:</strong> ${order.product}</p>
-                  <p><strong>Quantity:</strong> ${order.qty}</p>
-                  <p><strong>Address:</strong> ${order.address}</p>
-                  <p><strong>Date:</strong> ${order.date}</p>
-                  <p><strong>Price:</strong> ${order.price}</p>
+                  <p><strong>Order ID:</strong> ${order._id}</p>
+                  <p><strong>Customer:</strong> ${order.shippingAddress.fullName}</p>
+                  <p><strong>Items:</strong> ${order.items
+                    .map(
+                      (item) =>
+                        `${item.productName} (${item.color}, x${item.quantity})`,
+                    )
+                    .join("; ")}</p>
+                  <p><strong>Total:</strong> ₹${order.totalAmount}</p>
+                  <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
                   <hr/>
                 </div>
               `,
@@ -125,14 +122,26 @@ const OrdersPage = () => {
         </body>
       </html>
     `);
-
     printWindow.document.close();
     printWindow.print();
   };
 
+  // Count pending orders (status "pending")
+  const pendingCount = orders.filter(
+    (order) => order.orderStatus?.toLowerCase() === "pending",
+  ).length;
+
+  if (loading) return <div>Loading orders...</div>;
+
   return (
     <div className="orderspage-container">
-      <h2 className="orderspage-title">Orders</h2>
+      <div className="orderspage-header">
+        <h2 className="orderspage-title">Orders</h2>
+        <div className="pending-tasks-box">
+          <span className="pending-tasks-label">Pending Orders</span>
+          <span className="pending-tasks-count">{pendingCount}</span>
+        </div>
+      </div>
 
       <button
         style={{
@@ -146,7 +155,7 @@ const OrdersPage = () => {
         }}
         onClick={handlePrintTakenOrders}
       >
-        Print Taken Orders
+        Print Out‑for‑Delivery Orders
       </button>
 
       <div className="orderspage-table-wrapper">
@@ -155,44 +164,57 @@ const OrdersPage = () => {
             <tr className="orderspage-header-row">
               <th className="orderspage-th">#</th>
               <th className="orderspage-th">Order ID</th>
-              <th className="orderspage-th">Product Name</th>
-              <th className="orderspage-th">Quantity</th>
+              <th className="orderspage-th">Customer</th>
+              <th className="orderspage-th">Items (Color, Qty)</th>
               <th className="orderspage-th">Address</th>
               <th className="orderspage-th">Date</th>
-              <th className="orderspage-th">Price</th>
-              <th className="orderspage-th">Action</th>
+              <th className="orderspage-th">Total</th>
+              <th className="orderspage-th">Status</th>
+              <th className="orderspage-th">Actions</th>
             </tr>
           </thead>
-
           <tbody className="orderspage-tbody">
             {orders.map((order, index) => (
-              <tr key={order.id} className="orderspage-row">
+              <tr key={order._id} className="orderspage-row">
                 <td className="orderspage-td">{index + 1}</td>
-                <td className="orderspage-td orderspage-orderid">{order.id}</td>
-                <td className="orderspage-td">{order.product}</td>
-                <td className="orderspage-td">{order.qty}</td>
-                <td className="orderspage-td">{order.address}</td>
-                <td className="orderspage-td">{order.date}</td>
-                <td className="orderspage-td">{order.price}</td>
-
+                <td className="orderspage-td orderspage-orderid">
+                  {order._id}
+                </td>
+                <td className="orderspage-td">
+                  {order.shippingAddress?.fullName || "N/A"}
+                </td>
+                <td className="orderspage-td">
+                  {order.items?.map((item) => (
+                    <div key={item._id}>
+                      {item.productName} ({item.color}, x{item.quantity})
+                    </div>
+                  ))}
+                </td>
+                <td className="orderspage-td">
+                  {order.shippingAddress?.addressLine1},{" "}
+                  {order.shippingAddress?.city}
+                </td>
+                <td className="orderspage-td">
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </td>
+                <td className="orderspage-td">₹{order.totalAmount}</td>
+                <td className="orderspage-td">
+                  {order.orderStatus === "shipped"
+                    ? "Out for delivery"
+                    : order.orderStatus}
+                </td>
                 <td
                   className="orderspage-td"
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}
+                  style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
                 >
-                  {order.status === "pending" && (
+                  {order.orderStatus?.toLowerCase() === "pending" && (
                     <>
                       <button
                         className="orderspage-btn"
-                        onClick={() => handleTakeOrder(order.id)}
+                        onClick={() => handleTakeOrder(order._id)}
                       >
-                        taken
+                        take
                       </button>
-
                       <button
                         className="orderspage-btn"
                         onClick={() => openCancelModal(order)}
@@ -201,16 +223,19 @@ const OrdersPage = () => {
                       </button>
                     </>
                   )}
-
-                  {order.status === "packing" && (
-                    <span style={{ color: "green", fontWeight: "bold" }}>
-                      packing
+                  {order.orderStatus?.toLowerCase() === "shipped" && (
+                    <span style={{ color: "blue", fontWeight: "bold" }}>
+                      Out for delivery
                     </span>
                   )}
-
-                  {order.status === "cancelled" && (
+                  {order.orderStatus?.toLowerCase() === "delivered" && (
+                    <span style={{ color: "gray", fontWeight: "bold" }}>
+                      Delivered
+                    </span>
+                  )}
+                  {order.orderStatus?.toLowerCase() === "cancelled" && (
                     <span style={{ color: "red", fontWeight: "bold" }}>
-                      cancelled
+                      Cancelled
                     </span>
                   )}
                 </td>
@@ -220,37 +245,49 @@ const OrdersPage = () => {
         </table>
       </div>
 
+      {/* Cancel Modal */}
       {showCancelModal && (
-        <div className="cancel-modal-overlay">
-          <div className="cancel-modal">
-            <h3>Cancel Order {selectedOrder?.id}</h3>
+        <div
+          className="orderpage-modal-overlay"
+          onClick={() => {
+            console.log("Overlay clicked, closing modal");
+            setShowCancelModal(false);
+          }}
+        >
+          <div
+            className="orderpage-modal"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Modal content clicked, not closing");
+            }}
+          >
+            <h3>Cancel Order {selectedOrder?._id}</h3>
 
             <textarea
               placeholder="Write email message to customer..."
               value={emailMessage}
               onChange={(e) => setEmailMessage(e.target.value)}
               rows={5}
-              style={{
-                width: "100%",
-                padding: "8px",
-                marginTop: "10px",
-              }}
             />
 
-            <div
-              style={{
-                marginTop: "15px",
-                display: "flex",
-                gap: "10px",
-              }}
-            >
-              <button className="orderspage-btn" onClick={confirmCancelOrder}>
+            <div className="orderpage-modal-actions">
+              <button
+                className="orderpage-modal-btn"
+                onClick={() => {
+                  console.log("Send & Cancel clicked");
+                  confirmCancelOrder();
+                }}
+              >
                 Send & Cancel
               </button>
-
               <button
-                className="orderspage-btn"
-                onClick={() => setShowCancelModal(false)}
+                className="orderpage-modal-btn close"
+                onClick={() => {
+                  console.log("Close modal clicked");
+                  setShowCancelModal(false);
+                  setEmailMessage("");
+                  setSelectedOrder(null);
+                }}
               >
                 Close
               </button>

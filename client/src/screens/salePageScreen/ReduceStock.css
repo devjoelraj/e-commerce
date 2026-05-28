@@ -1,0 +1,114 @@
+.sale-container {
+  max-width: 620px;
+  margin: 120px auto;
+  padding: 35px;
+  background: linear-gradient(135deg, #f9fbff, #eef3ff);
+  border-radius: 16px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  position: relative;
+}
+
+.sale-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.sale-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sale-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sale-form-group label {
+  font-weight: 500;
+  color: #444;
+  font-size: 13px;
+}
+
+.sale-select,
+.sale-input {
+  padding: 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  transition: all 0.25s ease;
+}
+
+.sale-select:focus,
+.sale-input:focus {
+  outline: none;
+  border-color: #4b7bec;
+  box-shadow: 0 0 0 3px rgba(75, 123, 236, 0.15);
+  transform: scale(1.01);
+}
+
+.sale-loading-placeholder {
+  padding: 12px;
+  background: #eef2ff;
+  border-radius: 8px;
+  color: #555;
+  text-align: center;
+}
+
+.sale-info-message {
+  padding: 10px;
+  background: #f1f3f6;
+  border-radius: 8px;
+  color: #777;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ✅ Button style upgrade */
+.sale-submit-btn {
+  margin-top: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, #4b7bec, #6c5ce7);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.sale-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(75, 123, 236, 0.3);
+}
+
+.sale-submit-btn:disabled {
+  background: #b2c3f5;
+  cursor: not-allowed;
+}
+
+/* 🔴 Logout button */
+.logout-btn-sale {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn-sale:hover {
+  background: #e84118;
+}

@@ -2,47 +2,47 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      trim: true,
-    },
     email: {
       type: String,
+      required: true,
       unique: true,
-      sparse: true,
       lowercase: true,
+      trim: true,
     },
-    phone: {
-      type: String,
-      unique: true,
-      sparse: true,
-    },
-    gender: {
-      type: String,
-      enum: ["male", "female", "other"],
-    },
-    password: {
-      type: String,
-    },
+    username: String,
+    password: { type: String, required: false },
+    address: String,
+    isVerified: { type: Boolean, default: false },
+    refreshToken: String,
+    otpHash: String,
+    otpExpires: Number,
+    resetOtpHash: String,
     role: {
       type: String,
+      enum: ["user", "admin", "superadmin"],
       default: "user",
     },
-    loginAttempts: {
-      type: Number,
-      default: 0,
-    },
-    refreshToken: {
-      type: String,
-    },
-    status: {
-      type: String,
-      enum: ["PENDING", "ACTIVE", "SUSPENDED"],
-      default: "PENDING",
-    },
-    otp: String,
-    otpExpires: Date,
+    resetOtpExpires: Number,
+    resetOtpVerified: { type: Boolean, default: false },
+    loginAttempts: { type: Number, default: 0 },
     lockUntil: Date,
+    watchlist: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        category: {
+          type: String,
+          required: true,
+          enum: ["Pants", "Shirts", "Footwear", "Accessories"],
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true },
 );

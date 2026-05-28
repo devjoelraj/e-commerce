@@ -1,37 +1,124 @@
-import React from "react";
-import { FaHeart, FaStar } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaHeart, FaRegHeart, FaStar } from "react-icons/fa";
+import {
+  addToWatchlistService,
+  removeFromWatchlistService,
+} from "../../api/userServices/productsServices";
 import "./ProductCards.css";
-
+import presentToast from "../Toast/Toast";
 const ProductCards = ({
-  productname = "Cool T-Shirt",
-  actualValue = 234,
-  discountValue = 267,
-  startValue = 3,
-  reviewsCount = 64,
+  productId,
+  category,
+  productname = "please refresh the page",
+  actualValue = 404,
+  discountValue = 404,
+  startValue = 0,
+  reviewsCount = 404,
   image = "https://picsum.photos/200/300",
+  onClick,
+  isWishlisted = false,
 }) => {
+  const [wishlisted, setWishlisted] = useState(isWishlisted);
+  const [loading, setLoading] = useState(false);
+
+  const handleWatchlist = async (e) => {
+    e.stopPropagation();
+
+    if (loading) return;
+
+    // Normalize category to the format expected by backend (capitalized)
+    const normalizeCategory = (cat) => {
+      const map = {
+        shirts: "Shirts",
+        pants: "Pants",
+        footwear: "Footwear",
+        accessories: "Accessories",
+        shoe: "Footwear", // if type is passed instead of category
+        slipper: "Footwear",
+        watch: "Accessories",
+        chain: "Accessories",
+        ring: "Accessories",
+      };
+      // If it's already capitalized and in the allowed list, return as is
+      const allowed = ["Shirts", "Pants", "Footwear", "Accessories"];
+      if (allowed.includes(cat)) return cat;
+      // Otherwise try to map from lowercase or subtype
+      return map[cat?.toLowerCase()] || cat;
+    };
+
+    const normalizedCategory = normalizeCategory(category);
+    if (
+      !normalizedCategory ||
+      !["Shirts", "Pants", "Footwear", "Accessories"].includes(
+        normalizedCategory,
+      )
+    ) {
+      presentToast.error("Cannot add to watchlist: invalid category");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      if (wishlisted) {
+        const res = await removeFromWatchlistService(
+          productId,
+          normalizedCategory,
+        );
+        if (res?.success) {
+          setWishlisted(false);
+        }
+      } else {
+        const res = await addToWatchlistService(productId, normalizedCategory);
+        console.log(res.message, "m");
+        if (res?.success) {
+          setWishlisted(true);
+        } else {
+          presentToast.error(res.message || "Failed to add to watchlist");
+        }
+      }
+    } catch (error) {
+      console.error("Watchlist error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="product-card">
+    <div
+      className="product-card"
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+    >
       <div className="product-header">
-        <FaHeart className="heart-icon" title="Add to Wishlist" />
+        {loading ? (
+          <div className="heart-loader"></div>
+        ) : wishlisted ? (
+          <FaHeart
+            className="heart-icon filled-heart"
+            onClick={handleWatchlist}
+          />
+        ) : (
+          <FaRegHeart className="heart-icon" onClick={handleWatchlist} />
+        )}
       </div>
+
       <img src={image} alt="product" className="product-image" />
 
       <div className="product-info">
         <h3 className="product-name">{productname}</h3>
+
         <p className="product-description">
           <del>${discountValue}</del> ${actualValue}
         </p>
 
-        <button className="add-to-cart">Add to Cart</button>
+        <button className="add-to-cart">View Product</button>
 
         <div className="product-rating">
           {[...Array(5)].map((_, i) => (
             <FaStar
               key={i}
-              style={{
-                color: i < startValue ? "#ffc107" : "#ccc",
-              }}
+              style={{ color: i < startValue ? "#ffc107" : "#ccc" }}
             />
           ))}
           <span className="review-count">({reviewsCount})</span>

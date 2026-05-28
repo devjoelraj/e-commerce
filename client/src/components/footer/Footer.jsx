@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaMapMarkerAlt,
   FaFacebookF,
@@ -9,6 +10,31 @@ import {
 import "./Footer.css";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleNavigation = (path, state = {}) => {
+    navigate(path, { state });
+  };
+
+  const handleSocialClick = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const socialLinks = [
+    { icon: FaFacebookF, url: "https://facebook.com" },
+    { icon: FaInstagram, url: "https://instagram.com" },
+    { icon: FaTwitter, url: "https://twitter.com" },
+    { icon: FaLinkedinIn, url: "https://linkedin.com" },
+  ];
+
+  const importantLinks = [
+    { label: "Privacy Policy", path: "/important/privacy" },
+    { label: "Return Policy", path: "/important/returns" },
+    { label: "Terms & Conditions", path: "/important/terms" },
+    { label: "Contact Us", path: "/important/contact" },
+    { label: "Support", path: "/important/support" },
+  ];
+
   return (
     <footer className="footer">
       <div className="footer-flex">
@@ -30,27 +56,57 @@ const Footer = () => {
           <div className="footer-col">
             <h4 className="footer-heading">Quick Links</h4>
             <ul className="footer-list">
-              <li className="footer-item">Home</li>
-              <li className="footer-item">Shop</li>
-              <li className="footer-item">Mens</li>
-              <li className="footer-item">Trends</li>
+              <li className="footer-item" onClick={() => handleNavigation("/")}>
+                Home
+              </li>
+              <li
+                className="footer-item"
+                onClick={() =>
+                  handleNavigation("/ProductLists", { category: "All" })
+                }
+              >
+                All
+              </li>
+              <li
+                className="footer-item"
+                onClick={() =>
+                  handleNavigation("/ProductLists", { category: "Shirts" })
+                }
+              >
+                Shirts
+              </li>
+              <li
+                className="footer-item"
+                onClick={() =>
+                  handleNavigation("/ProductLists", { category: "Pants" })
+                }
+              >
+                Pants
+              </li>
             </ul>
           </div>
 
           <div className="footer-col">
             <h4 className="footer-heading">Important Links</h4>
             <ul className="footer-list">
-              <li className="footer-item">Privacy Policy</li>
-              <li className="footer-item">Return Policy</li>
-              <li className="footer-item">Terms & Conditions</li>
-              <li className="footer-item">Contact Us</li>
-              <li className="footer-item">Support</li>
+              {importantLinks.map((link) => (
+                <li
+                  key={link.label}
+                  className="footer-item"
+                  onClick={() => handleNavigation(link.path)}
+                >
+                  {link.label}
+                </li>
+              ))}
             </ul>
             <div className="footer-socials">
-              <FaFacebookF className="footer-icon" />
-              <FaInstagram className="footer-icon" />
-              <FaTwitter className="footer-icon" />
-              <FaLinkedinIn className="footer-icon" />
+              {socialLinks.map((social, idx) => (
+                <social.icon
+                  key={idx}
+                  className="footer-icon"
+                  onClick={() => handleSocialClick(social.url)}
+                />
+              ))}
             </div>
           </div>
         </div>

@@ -1,65 +1,151 @@
 import {
+  completeSignupService,
   loginService,
   logoutService,
-  refreshService,
+  refreshTokenService,
+  resetPasswordService,
+  sendForgotOtpService,
+  sendSignupOtpService,
+  verifyForgotOtpService,
+  verifySignupOtpService,
 } from "../services/auth.services.js";
 
-export const loginUser = async (req, res, next) => {
+export const sendSignupOtpController = async (req, res) => {
   try {
-    const { accessToken, refreshToken } = await loginService(req.body);
+    const { email } = req.body;
+    const result = await sendSignupOtpService({ email });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
 
-    res.cookie("refreshToken", refreshToken, {
+export const verifySignupOtpController = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const result = await verifySignupOtpService({ email, otp });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const completeSignupController = async (req, res) => {
+  try {
+    const { email, username, password, address } = req.body;
+    const result = await completeSignupService({
+      email,
+      username,
+      password,
+      address,
+    });
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const loginController = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const result = await loginService({ email, password });
+
+    res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({
-      success: true,
-      accessToken,
-    });
+    delete result.refreshToken;
+
+    res.status(200).json(result);
   } catch (error) {
-    next(error);
+    res.status(401).json({ success: false, message: error.message });
   }
 };
 
-export const refreshTokenController = async (req, res, next) => {
+export const refreshTokenController = async (req, res) => {
+  console.log("📥 [refreshTokenController] Received request");
+  console.log("🍪 Cookies:", req.cookies);
+  console.log("📦 Body:", req.body);
+
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+    console.log("🔑 Token present:", refreshToken ? "yes" : "no");
 
-    const { accessToken, refreshToken: newRefreshToken } =
-      await refreshService(refreshToken);
+    if (!refreshToken) {
+      console.warn("⚠️ [refreshTokenController] No refresh token");
+      return res
+        .status(401)
+        .json({ success: false, message: "Refresh token missing" });
+    }
 
-    res.cookie("refreshToken", newRefreshToken, {
+    console.log("🔄 Calling refreshTokenService...");
+    const result = await refreshTokenService({ refreshToken });
+    console.log("✅ [refreshTokenController] Service succeeded");
+
+    res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    console.log("🍪 New refresh token cookie set");
 
     res.status(200).json({
       success: true,
-      accessToken,
+      accessToken: result.accessToken,
     });
+    console.log("✅ [refreshTokenController] Response sent");
   } catch (error) {
-    next(error);
+    console.error("❌ [refreshTokenController] Error:", error.message);
+    res.status(401).json({ success: false, message: error.message });
   }
 };
-
-export const logoutUser = async (req, res, next) => {
+export const logoutController = async (req, res) => {
   try {
-    await logoutService(req.user.id);
+    const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+    await logoutService({ refreshToken });
 
-    res.clearCookie("refreshToken");
-
-    res.status(200).json({
-      success: true,
-      message: "Logged out successfully",
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
+
+    res.status(200).json({ success: true, message: "Logged out" });
   } catch (error) {
-    next(error);
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
-export const SignUp = async (req, res, next) => {};
+export const sendForgotOtpController = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await sendForgotOtpService({ email });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const verifyForgotOtpController = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const result = await verifyForgotOtpService({ email, otp });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const resetPasswordController = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const result = await resetPasswordService({ email, newPassword });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};

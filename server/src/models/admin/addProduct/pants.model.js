@@ -7,10 +7,12 @@ const pantsSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     description: {
       type: String,
       required: true,
     },
+
     pricing: {
       basePrice: {
         type: Number,
@@ -25,21 +27,32 @@ const pantsSchema = new mongoose.Schema(
         required: true,
       },
     },
-    sizes: {
-      type: Map,
-      of: Number, // e.g., { "30": 10, "32": 15, "34": 20 }
-      required: true,
-    },
+
     colors: [
       {
         name: {
           type: String,
           required: true,
         },
+
         hex: {
           type: String,
           required: true,
         },
+
+        sizes: [
+          {
+            size: {
+              type: String,
+              required: true,
+            },
+            qty: {
+              type: Number,
+              required: true,
+            },
+          },
+        ],
+
         images: [
           {
             imageUrl: {
@@ -54,20 +67,25 @@ const pantsSchema = new mongoose.Schema(
         ],
       },
     ],
+
     totalQuantity: {
       type: Number,
       default: 0,
     },
+
     isActive: {
       type: Boolean,
       default: true,
     },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    offerProduct: { type: Boolean, default: false },
   },
+
   { timestamps: true },
 );
 
-export default mongoose.model("Pants", pantsSchema);
+export default mongoose.models.Pants || mongoose.model("Pants", pantsSchema);

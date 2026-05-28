@@ -1,38 +1,170 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./AllProducts.css";
+import {
+  getAllProductService,
+  deleteProductService,
+  updateProductService,
+} from "../../../api/adminServices/allProductService";
+import ContinueButton from "../../../components/buttons/ContinueButton";
+import presentToast from "../../../components/Toast/Toast";
+import ConfirmModal from "../../../components/popUp/ConfirmModal";
+import EditProductModal from "./EditProductModal";
 
 const AllProducts = () => {
-  const products = [
-    { id: 1, productName: "Shirt", totalProduct: 10, remendingProduct: 5 },
-    { id: 2, productName: "Shoes", totalProduct: 25, remendingProduct: 12 },
-    { id: 3, productName: "Watch", totalProduct: 15, remendingProduct: 8 },
-    { id: 4, productName: "Bag", totalProduct: 30, remendingProduct: 20 },
-    { id: 5, productName: "Laptop", totalProduct: 8, remendingProduct: 3 },
-  ];
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+
+  useEffect(() => {
+    fetchAllProducts();
+  }, []);
+
+  const fetchAllProducts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getAllProductService();
+      if (response?.success) {
+        setProducts(response?.data || []);
+      } else {
+        presentToast.error(response?.message || "Failed to fetch products");
+      }
+    } catch (error) {
+      presentToast.error("Something went wrong");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateProduct = async (data) => {
+    try {
+      setEditLoading(true);
+      const response = await updateProductService(data);
+      if (response?.success) {
+        presentToast.success("Product updated");
+        await fetchAllProducts();
+        setShowEditModal(false);
+        setSelectedProduct(null);
+      } else {
+        presentToast.error(response?.message);
+      }
+    } catch (error) {
+      presentToast.error("Update failed");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedProduct) return;
+    const { _id: productId, category } = selectedProduct;
+    try {
+      setDeleteLoadingId(productId);
+      const response = await deleteProductService({ productId, category });
+      if (response?.success) {
+        presentToast.success("Product deleted successfully");
+        await fetchAllProducts();
+        setShowDeleteModal(false);
+        setSelectedProduct(null);
+      } else {
+        presentToast.error(response?.message || "Delete failed");
+      }
+    } catch (error) {
+      presentToast.error("Delete failed");
+      console.error(error);
+    } finally {
+      setDeleteLoadingId(null);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="loading-text">Loading products...</div>;
+  }
+
+  if (!isLoading && products.length === 0) {
+    return <div className="no-products">No products found.</div>;
+  }
 
   return (
     <div className="allproducts-container">
       <h2 className="allproducts-heading">All Products</h2>
+
       <table className="allproducts-table">
         <thead>
           <tr>
-            <th className="allproducts-th">#</th>
-            <th className="allproducts-th">Product Name</th>
-            <th className="allproducts-th">Total Product</th>
-            <th className="allproducts-th">Remaining Product</th>
+            <th>#</th>
+            <th>Product Name</th>
+            <th>Total Stock</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {products.map((item, index) => (
-            <tr key={item.id} className="allproducts-tr">
-              <td className="allproducts-td">{index + 1}</td>
-              <td className="allproducts-td">{item.productName}</td>
-              <td className="allproducts-td">{item.totalProduct}</td>
-              <td className="allproducts-td">{item.remendingProduct}</td>
+            <tr key={item._id}>
+              <td>{index + 1}</td>
+              <td className="product-name">{item.productName}</td>
+              <td>{item.totalQuantity}</td>
+              <td className="actions">
+                <button
+                  className="edit-btn"
+                  onClick={() => {
+                    setSelectedProduct(item);
+                    setShowEditModal(true);
+                  }}
+                >
+                  Edit
+                </button>{" "}
+                <ContinueButton
+                  text="Delete"
+                  loading={deleteLoadingId === item._id}
+                  onClick={() => {
+                    setSelectedProduct(item);
+                    setShowDeleteModal(true);
+                  }}
+                  style={{
+                    backgroundColor: "#e74c3c",
+                    padding: "6px 14px",
+                    border: "none",
+                    color: "white",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    width: "fit-content",
+                  }}
+                />
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete Product"
+        message={`Are you sure you want to delete ${selectedProduct?.productName}?`}
+        loading={deleteLoadingId === selectedProduct?._id}
+        confirmText="Delete"
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setSelectedProduct(null);
+        }}
+        onConfirm={handleDelete}
+      />
+
+      <EditProductModal
+        open={showEditModal}
+        product={selectedProduct}
+        loading={editLoading}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedProduct(null);
+        }}
+        onSave={handleUpdateProduct}
+      />
     </div>
   );
 };

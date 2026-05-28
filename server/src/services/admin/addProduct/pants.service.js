@@ -1,8 +1,6 @@
 import Pants from "../../../models/admin/addProduct/pants.model.js";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../../../utils/cloudinary.util.js";
+import { addToSearchDB } from "../../../utils/addToSearchDB.js";
+import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
 
 export const createPantsProductService = async ({
   productName,
@@ -10,23 +8,12 @@ export const createPantsProductService = async ({
   basePrice,
   discountPercentage,
   discountPrice,
-  sizes,
   colors,
   colorImages,
   userId,
 }) => {
-  if (
-    !productName ||
-    !description ||
-    !basePrice ||
-    !discountPrice ||
-    !sizes ||
-    !colors ||
-    colors.length === 0
-  ) {
-    throw new Error(
-      "Product name, description, prices, sizes, and colors are required",
-    );
+  if (!productName || !description || !basePrice || !discountPrice || !colors) {
+    throw new Error("Required fields missing");
   }
 
   const imagePromises = [];
@@ -34,7 +21,8 @@ export const createPantsProductService = async ({
 
   colors.forEach((color) => {
     colorImageMap[color.name] = [];
-    if (colorImages[color.name] && colorImages[color.name].length > 0) {
+
+    if (colorImages[color.name]) {
       colorImages[color.name].forEach((file) => {
         imagePromises.push(
           uploadToCloudinary(file.buffer).then((result) => ({
@@ -55,13 +43,26 @@ export const createPantsProductService = async ({
     });
   });
 
-  const colorsWithImages = colors.map((color) => ({
-    name: color.name,
-    hex: color.hex,
-    images: colorImageMap[color.name] || [],
-  }));
+  let totalQuantity = 0;
 
-  const totalQuantity = Object.values(sizes).reduce((sum, qty) => sum + qty, 0);
+  const colorsWithImages = colors.map((color) => {
+    const sizesArray = Object.entries(color.sizes)
+      .filter(([_, qty]) => Number(qty) > 0)
+      .map(([size, qty]) => ({
+        size: String(size),
+        qty: Number(qty),
+      }));
+    const colorQty = sizesArray.reduce((sum, s) => sum + s.qty, 0);
+
+    totalQuantity += colorQty;
+
+    return {
+      name: color.name,
+      hex: color.hex,
+      sizes: sizesArray,
+      images: colorImageMap[color.name] || [],
+    };
+  });
 
   const pantsProduct = await Pants.create({
     productName,
@@ -71,102 +72,103 @@ export const createPantsProductService = async ({
       discountPercentage: Number(discountPercentage),
       discountPrice: Number(discountPrice),
     },
-    sizes: new Map(Object.entries(sizes)),
     colors: colorsWithImages,
     totalQuantity,
     createdBy: userId,
   });
+  await addToSearchDB(pantsProduct, "pants");
 
   return pantsProduct;
 };
 
-export const getPantsProductsService = async (filters = {}) => {
-  return await Pants.find(filters)
+export const getPantsProductsService = async (
+  filters = {},
+  page = 1,
+  limit = 15,
+) => {
+  const skip = (page - 1) * limit;
+
+  const products = await Pants.find(filters)
     .populate("createdBy", "email")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Pants.countDocuments(filters);
+
+  return {
+    products,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 
-export const updatePantsProductService = async (id, updateData) => {
-  const product = await Pants.findById(id);
-  if (!product) throw new Error("Pants product not found");
+export const addColorVariantService = async (
+  productId,
+  colorsString,
+  files,
+) => {
+  const colors = JSON.parse(colorsString);
 
-  if (updateData.sizes && typeof updateData.sizes === "string") {
-    try {
-      updateData.sizes = JSON.parse(updateData.sizes);
-    } catch (e) {
-      throw new Error("Invalid sizes data");
-    }
+  const product = await Pants.findById(productId);
+
+  if (!product) {
+    throw new Error("Product not found");
   }
 
-  if (updateData.pricing) {
-    updateData.pricing = {
-      basePrice: updateData.pricing.basePrice || product.pricing.basePrice,
-      discountPercentage:
-        updateData.pricing.discountPercentage ||
-        product.pricing.discountPercentage,
-      discountPrice:
-        updateData.pricing.discountPrice || product.pricing.discountPrice,
-    };
-  }
+  const colorImageMap = {};
+  const imagePromises = [];
 
-  if (updateData.sizes) {
-    const totalQuantity = Object.values(updateData.sizes).reduce(
-      (sum, qty) => sum + qty,
-      0,
+  colors.forEach((color) => {
+    const existingColor = product.colors.find(
+      (c) => c.name.toLowerCase() === color.name.toLowerCase(),
     );
-    updateData.totalQuantity = totalQuantity;
-    updateData.sizes = new Map(Object.entries(updateData.sizes));
-  }
 
-  if (
-    updateData.totalQuantity !== undefined &&
-    updateData.sizes === undefined
-  ) {
-    updateData.totalQuantity = Number(updateData.totalQuantity);
-  }
+    if (existingColor) {
+      throw new Error(`${color.name} color already exists`);
+    }
 
-  const updatedProduct = await Pants.findByIdAndUpdate(id, updateData, {
-    new: true,
-  }).populate("createdBy", "email");
+    colorImageMap[color.name] = [];
 
-  return updatedProduct;
-};
-
-export const deletePantsProductService = async (id) => {
-  const product = await Pants.findById(id);
-  if (!product) throw new Error("Pants product not found");
-
-  const deletePromises = [];
-  product.colors.forEach((color) => {
-    color.images.forEach((image) => {
-      deletePromises.push(deleteFromCloudinary(image.publicId));
+    files.forEach((file) => {
+      imagePromises.push(
+        uploadToCloudinary(file.buffer).then((result) => ({
+          ...result,
+          colorName: color.name,
+        })),
+      );
     });
   });
 
-  await Promise.all(deletePromises);
+  const uploadedImages = await Promise.all(imagePromises);
 
-  await Pants.findByIdAndDelete(id);
+  uploadedImages.forEach((img) => {
+    colorImageMap[img.colorName].push({
+      imageUrl: img.imageUrl,
+      publicId: img.publicId,
+    });
+  });
 
-  return true;
-};
+  colors.forEach((color) => {
+    const sizesArray = Object.entries(color.sizes)
+      .filter(([_, qty]) => Number(qty) > 0)
+      .map(([size, qty]) => ({
+        size: String(size),
+        qty: Number(qty),
+      }));
+    const colorQty = sizesArray.reduce((sum, s) => sum + s.qty, 0);
 
-export const deleteProductImageService = async (
-  productId,
-  colorName,
-  imageIndex,
-) => {
-  const product = await Pants.findById(productId);
-  if (!product) throw new Error("Pants product not found");
+    product.totalQuantity += colorQty;
 
-  const colorIndex = product.colors.findIndex((c) => c.name === colorName);
-  if (colorIndex === -1) throw new Error("Color not found");
+    product.colors.push({
+      name: color.name,
+      hex: color.hex,
+      sizes: sizesArray,
+      images: colorImageMap[color.name] || [],
+    });
+  });
 
-  const image = product.colors[colorIndex].images[imageIndex];
-  if (!image) throw new Error("Image not found");
-
-  await deleteFromCloudinary(image.publicId);
-
-  product.colors[colorIndex].images.splice(imageIndex, 1);
   await product.save();
 
   return product;

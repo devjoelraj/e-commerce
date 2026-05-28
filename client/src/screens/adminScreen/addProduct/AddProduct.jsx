@@ -17,11 +17,11 @@ const AddProduct = () => {
       subtitle: "",
       onAdd: () => navigate("/admin/sel-upload-products"),
     },
-    {
-      title: "Offers Products",
-      subtitle: "",
-      onAdd: () => navigate("/admin/add-offer-product"),
-    },
+    // {
+    //   title: "Offers Products",
+    //   subtitle: "",
+    //   onAdd: () => navigate("/admin/add-offer-product"),
+    // },
   ];
 
   return (

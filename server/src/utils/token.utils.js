@@ -8,3 +8,11 @@ export const generateAccessToken = (payload) => {
 export const generateRefreshToken = (payload) => {
   return jwt.sign(payload, refreshTokenSecret, { expiresIn: "7d" });
 };
+
+export const verifyAccessToken = (token) => {
+  return jwt.verify(token, accessTokenSecret);
+};
+
+export const verifyRefreshToken = (token) => {
+  return jwt.verify(token, refreshTokenSecret);
+};

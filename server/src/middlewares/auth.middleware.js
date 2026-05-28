@@ -12,6 +12,7 @@ export const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, accessTokenSecret);
+    console.log("✅ Decoded token:", decoded);
     req.user = decoded;
     next();
   } catch (error) {

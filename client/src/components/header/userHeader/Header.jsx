@@ -18,13 +18,14 @@ const Header = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openSection, setOpenSection] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const navItems = ["Home", "Deals", "Trends", "Shirts", "Pants"];
+  const navItems = ["Home", "Deals", "All", "Shirts", "Pants"];
 
   const sidebarItems = [
     "Home",
     "Deals",
-    "Trends",
+    "All",
     "Shirts",
     "Pants",
     "Accessories",
@@ -32,42 +33,56 @@ const Header = () => {
   ];
 
   const dropdownSections = {
-    footwears: ["shoe", "silppers"],
-    Accessories: ["Watch", "Chains", "Rings"],
+    footwears: ["shoe", "slipper"],
+    Accessories: ["watch", "chain", "ring"],
   };
-
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(
+        `/ProductLists?search=${encodeURIComponent(searchQuery.trim())}`,
+      );
+      setSearchQuery("");
+    }
+  };
   const handleNavigation = (item) => {
     setSidebarOpen(false);
     setOpenSection(null);
 
     if (item.includes(" - ")) {
       const [section, category] = item.split(" - ");
+
+      const mainCategory =
+        section.toLowerCase() === "footwears" ? "Footwear" : section;
+
       navigate("/ProductLists", {
-        state: { data: section, category },
+        state: {
+          category: mainCategory,
+          type: category.toLowerCase(),
+        },
       });
+
       return;
     }
 
     switch (item) {
       case "Home":
-        navigate("/user-dashboard");
+        navigate("/");
         break;
 
       case "Deals":
-        navigate("/user-dashboard", {
-          state: { scrollToDeals: true },
-        });
+        navigate("/productLists", { state: { category: "Deals" } });
         break;
 
-      case "Trends":
+      case "All":
         navigate("/ProductLists", {
-          state: { data: "Trends" },
+          state: { category: "All" },
         });
         break;
 
       default:
         navigate("/ProductLists", {
-          state: { data: item },
+          state: { category: item },
         });
     }
   };
@@ -88,19 +103,21 @@ const Header = () => {
           src="/logo.png"
           alt="logo"
           className="logo"
-          onClick={() => navigate("/user-dashboard")}
+          onClick={() => navigate("/")}
           style={{ cursor: "pointer" }}
         />
 
-        <div className="search-wrapper">
+        <form onSubmit={handleSearch} className="search-wrapper">
           <input
             type="text"
             name="search"
             placeholder="Search for products"
             className="search-input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <FaSearch className="search-icon" />
-        </div>
+          <FaSearch className="search-icon" onClick={handleSearch} />
+        </form>
 
         <div className="icons-wrapper">
           <FaHeart
